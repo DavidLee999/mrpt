@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -20,6 +20,7 @@
 #include <mrpt/poses/CPose3DPDF.h>
 #include <mrpt/poses/CPosePDF.h>
 #include <mrpt/slam/CICP.h>
+
 #include <Eigen/Dense>
 
 using namespace mrpt;
@@ -200,9 +201,9 @@ TEST_F(ICPTests, RayTracingICP3D)
 	icp.options.thresholdAng = 0;
 
 	CPose3DPDF::Ptr pdf = icp.Align3D(
-		&M2_noisy,  // Map to align
+		&M2_noisy,	// Map to align
 		&M1,  // Reference map
-		CPose3D(),  // Initial gross estimate
+		CPose3D(),	// Initial gross estimate
 		icp_info);
 
 	CPose3D mean = pdf->getMeanVal();

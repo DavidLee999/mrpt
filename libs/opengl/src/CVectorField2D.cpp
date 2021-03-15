@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
+#include "opengl-precomp.h"	 // Precompiled header
+//
 #include <mrpt/opengl/CVectorField2D.h>
 #include <mrpt/serialization/CArchive.h>
 
@@ -97,8 +97,7 @@ void CVectorField2D::onUpdateBuffers_Triangles()
 	for (int i = 0; i < xcomp.cols(); i++)
 		for (int j = 0; j < xcomp.rows(); j++)
 		{
-			const float tri_side =
-				0.25f *
+			const float tri_side = 0.25f *
 				sqrt(xcomp(j, i) * xcomp(j, i) + ycomp(j, i) * ycomp(j, i));
 			const float ang = ::atan2f(ycomp(j, i), xcomp(j, i)) - 1.5708f;
 			tris.emplace_back(
@@ -179,63 +178,14 @@ void CVectorField2D::serializeFrom(
 			in >> m_field_color;
 			break;
 
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
-			break;
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version); break;
 	};
 	CRenderizable::notifyChange();
 }
 
-void CVectorField2D::getBoundingBox(
-	mrpt::math::TPoint3D& bb_min, mrpt::math::TPoint3D& bb_max) const
+auto CVectorField2D::getBoundingBox() const -> mrpt::math::TBoundingBox
 {
-	bb_min.x = xMin;
-	bb_min.y = yMin;
-	bb_min.z = 0;
-
-	bb_max.x = xMax;
-	bb_max.y = yMax;
-	bb_max.z = 0;
-
-	const float x_cell_size = (xMax - xMin) / (xcomp.cols() - 1);
-	const float y_cell_size = (yMax - yMin) / (ycomp.rows() - 1);
-
-	for (int i = 0; i < xcomp.cols(); i++)
-		for (int j = 0; j < xcomp.rows(); j++)
-		{
-			const float tri_side =
-				0.25f *
-				sqrt(xcomp(j, i) * xcomp(j, i) + ycomp(j, i) * ycomp(j, i));
-			const float ang = ::atan2f(ycomp(j, i), xcomp(j, i)) - 1.5708f;
-
-			if (-sin(ang) * 0.866f * tri_side + xMin + i * x_cell_size +
-					xcomp(j, i) <
-				bb_min.x)
-				bb_min.x = -sin(ang) * 0.866f * tri_side + xMin +
-						   i * x_cell_size + xcomp(j, i);
-
-			if (cos(ang) * 0.866f * tri_side + yMin + j * y_cell_size +
-					ycomp(j, i) <
-				bb_min.y)
-				bb_min.y = cos(ang) * 0.866f * tri_side + yMin +
-						   j * y_cell_size + ycomp(j, i);
-
-			if (-sin(ang) * 0.866f * tri_side + xMin + i * x_cell_size +
-					xcomp(j, i) >
-				bb_max.x)
-				bb_max.x = -sin(ang) * 0.866f * tri_side + xMin +
-						   i * x_cell_size + xcomp(j, i);
-
-			if (cos(ang) * 0.866f * tri_side + yMin + j * y_cell_size +
-					ycomp(j, i) >
-				bb_max.y)
-				bb_max.y = cos(ang) * 0.866f * tri_side + yMin +
-						   j * y_cell_size + ycomp(j, i);
-		}
-
-	// Convert to coordinates of my parent:
-	m_pose.composePoint(bb_min, bb_min);
-	m_pose.composePoint(bb_max, bb_max);
+	return verticesBoundingBox().compose(m_pose);
 }
 
 void CVectorField2D::adjustVectorFieldToGrid()
@@ -250,8 +200,9 @@ void CVectorField2D::adjustVectorFieldToGrid()
 		ycomp.maxCoeff() * (ycomp.rows() - 1) / (yMax - yMin);
 	const float ratio_yn =
 		ycomp.minCoeff() * (ycomp.rows() - 1) / (yMax - yMin);
-	const float norm_factor = 0.85f / max(max(ratio_xp, std::abs(ratio_xn)),
-										  max(ratio_yp, std::abs(ratio_yn)));
+	const float norm_factor = 0.85f /
+		max(max(ratio_xp, std::abs(ratio_xn)),
+			max(ratio_yp, std::abs(ratio_yn)));
 
 	xcomp *= norm_factor;
 	ycomp *= norm_factor;

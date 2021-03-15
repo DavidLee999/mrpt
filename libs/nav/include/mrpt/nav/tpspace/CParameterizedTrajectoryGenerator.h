@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -19,6 +19,7 @@
 #include <mrpt/nav/holonomic/ClearanceDiagram.h>
 #include <mrpt/poses/CPose2D.h>
 #include <mrpt/serialization/CSerializable.h>
+
 #include <cstdint>
 
 namespace mrpt
@@ -510,7 +511,7 @@ class CParameterizedTrajectoryGenerator
 		ClearanceDiagram::dist2clearance_t& inout_realdist2clearance,
 		bool treat_as_obstacle = true) const;
 
-};  // end of class
+};	// end of class
 
 /** A list of PTGs (smart pointers) */
 using TListPTGPtr =

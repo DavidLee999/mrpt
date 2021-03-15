@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -11,8 +11,6 @@
  * icp3d
  * Execute an Iterative Closest Point algorithm using two 3D point clouds.
  */
-
-#include <mrpt/slam/CICP.h>
 
 #include <mrpt/gui/CDisplayWindow3D.h>
 #include <mrpt/maps/CSimplePointsMap.h>
@@ -23,6 +21,8 @@
 #include <mrpt/opengl/CSphere.h>
 #include <mrpt/opengl/stock_objects.h>
 #include <mrpt/poses/CPose3DPDF.h>
+#include <mrpt/slam/CICP.h>
+
 #include <iostream>
 
 using namespace std;
@@ -164,9 +164,9 @@ void test_icp3D()
 	cout << "Size of  xs in M2: " << xs.size() << endl;
 
 	CPose3DPDF::Ptr pdf = icp.Align3D(
-		&M2_noisy,  // Map to align
+		&M2_noisy,	// Map to align
 		&M1,  // Reference map
-		CPose3D(),  // Initial gross estimate
+		CPose3D(),	// Initial gross estimate
 		icp_info);
 
 	CPose3D mean = pdf->getMeanVal();

@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -24,8 +24,8 @@ class COpenGLBuffer
 	enum class Type : unsigned int
 	{
 		Vertex = 0x8892,  // GL_ARRAY_BUFFER (Default)
-		ElementIndex = 0x8893,  // GL_ELEMENT_ARRAY_BUFFER
-		PixelPack = 0x88EB,  // GL_PIXEL_PACK_BUFFER
+		ElementIndex = 0x8893,	// GL_ELEMENT_ARRAY_BUFFER
+		PixelPack = 0x88EB,	 // GL_PIXEL_PACK_BUFFER
 		PixelUnpack = 0x88EC  // GL_PIXEL_UNPACK_BUFFER
 	};
 

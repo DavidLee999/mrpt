@@ -8,7 +8,7 @@
 #  For compiling instructions for all compilers and platforms, see
 #   https://www.mrpt.org/Building_and_Installing_Instructions
 #
-#  2007-2018, Jose Luis Blanco <jlblanco@ual.es>
+#  2007-2020, Jose Luis Blanco <jlblanco@ual.es>
 #
 #  NOTE: CMake can be obtained at http://www.cmake.org/
 # ----------------------------------------------------------------------------
@@ -54,9 +54,6 @@ if(CMAKE_TIMING_VERBOSE AND UNIX)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_SOURCE_DIR}/cmakemodules/custom_output.sh")
 endif(CMAKE_TIMING_VERBOSE AND UNIX)
 
-# Require C++17
-# This is now defined as a PUBLIC interface feature of mrpt-core.
-
 # Detect wordsize:
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)  # Size in bytes!
 	set(CMAKE_MRPT_WORD_SIZE 64)
@@ -77,6 +74,10 @@ find_package(codecov)
 
 option(MRPT_ALLOW_LGPLV3 "Allows MRPT to use LGPLV3 code (mrpt-vision-lgpl)" "OFF")
 
+option(MRPT_EXCEPTIONS_WITH_CALL_STACK "Report callstack upon exceptions" "ON")
+set(MRPT_EXCEPTIONS_CALL_STACK_MAX_DEPTH "50" CACHE STRING "Maximum number of stack levels to show upon exceptions.")
+mark_as_advanced(MRPT_EXCEPTIONS_CALL_STACK_MAX_DEPTH)
+
 # The root directory for all MRPT libraries/modules:
 set(MRPT_LIBS_ROOT "${CMAKE_SOURCE_DIR}/libs" CACHE INTERNAL "")  # This emulates global vars
 
@@ -93,8 +94,8 @@ include(cmakemodules/FilterFileLists.cmake REQUIRED)
 include(cmakemodules/DeclareMRPTLib.cmake REQUIRED)
 include(cmakemodules/DeclareMEXLib.cmake REQUIRED)
 include(cmakemodules/DeclareAppDependencies.cmake REQUIRED)
-# --------------------------
 include(cmakemodules/script_detect_unix_arch.cmake REQUIRED) # Detect machine architecture, on UNIX
+# --------------------------
 
 # Avoid the need for DLL export/import macros in Windows:
 if (WIN32)
@@ -195,13 +196,6 @@ mark_as_advanced(MRPT_ENABLE_PRECOMPILED_HDRS)
 # ===================================================
 set(MRPT_HAS_STACKED_EXCEPTIONS ON CACHE BOOL "Enable MRPT_TRY_START/END blocks (disable it for speed up).")
 
-# Optional MRPT embedded profiler:
-# ===================================================
-set(MRPT_ENABLE_EMBEDDED_GLOBAL_PROFILER OFF CACHE BOOL "Enable MRPT embedded profiler.")
-if (MRPT_ENABLE_EMBEDDED_GLOBAL_PROFILER)
-	add_definitions(-DMRPT_ENABLE_EMBEDDED_GLOBAL_PROFILER)
-endif()
-
 # ASSERT_ blocks
 set(MRPT_HAS_ASSERT ON CACHE BOOL "Enable ASSERT_ statements (disable it for speed up).")
 
@@ -253,6 +247,7 @@ endif()
 # Other sub-scripts:
 # ----------------------------------------------------------------------------
 include(cmakemodules/script_assimp.cmake REQUIRED)      # Check for system assimp lib (3D models)
+include(cmakemodules/script_bfd.cmake REQUIRED)      # BFD library for debug symbols for stack backtraces
 include(cmakemodules/script_clang_tidy.cmake REQUIRED)  # Clang tidy
 include(cmakemodules/script_duo3d.cmake REQUIRED)       # Support for DUO3D Camera
 include(cmakemodules/script_eigen.cmake REQUIRED)       # Eigen3
@@ -276,6 +271,7 @@ include(cmakemodules/script_libtclap.cmake REQUIRED)    # Check for system libtc
 include(cmakemodules/script_matlab.cmake REQUIRED)      # Support for Matlab MEX functions generation
 include(cmakemodules/script_mynteye.cmake REQUIRED)     # Support for MYNT EYE cameras
 include(cmakemodules/script_nanogui.cmake REQUIRED)     # Check for nanogui
+include(cmakemodules/script_nanoflann.cmake REQUIRED)   # Check for nanoflann
 include(cmakemodules/script_national_instruments.cmake REQUIRED)  # NI C library
 include(cmakemodules/script_nite2.cmake REQUIRED)       # Check for NITE2 library
 include(cmakemodules/script_octomap.cmake REQUIRED)     # Check for the octomap library
@@ -601,8 +597,14 @@ endif()
 #	string(REGEX MATCH "[0-9]+" EIGEN_MAX_STATIC_ALIGN_BYTES "${EIGEN_MAX_STATIC_ALIGN_BYTES}")
 #else()
 #message(STATUS "Test Eigen build failed, falling back to default alignment (BUILD_EIGEN_SUCCESS=${BUILD_EIGEN_SUCCESS} RUN_EIGEN_RETVAL=${RUN_EIGEN_RETVAL} BUILD_EIGEN_OUT=${EIGEN_TEST_OUT})")
-	set(EIGEN_MAX_ALIGN_BYTES 32)
-	set(EIGEN_MAX_STATIC_ALIGN_BYTES 32)
+if (MRPT_ARCH_INTEL_COMPATIBLE)
+    set(EIGEN_MAX_ALIGN_BYTES 32)
+    set(EIGEN_MAX_STATIC_ALIGN_BYTES 32)
+else()
+    # for aarch64, etc.
+    set(EIGEN_MAX_ALIGN_BYTES 16)
+    set(EIGEN_MAX_STATIC_ALIGN_BYTES 16)
+endif()
 #endif()
 
 include(cmakemodules/script_create_config_h.cmake REQUIRED)   # Build config.h

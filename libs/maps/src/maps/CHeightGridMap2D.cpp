@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/config/CConfigFileBase.h>  // MRPT_LOAD_CONFIG_VAR()
 #include <mrpt/img/color_maps.h>
 #include <mrpt/maps/CHeightGridMap2D.h>
@@ -157,7 +157,7 @@ bool CHeightGridMap2D::internal_insertObservation(
   ---------------------------------------------------------------*/
 double CHeightGridMap2D::internal_computeObservationLikelihood(
 	[[maybe_unused]] const CObservation& obs,
-	[[maybe_unused]] const CPose3D& takenFrom)
+	[[maybe_unused]] const CPose3D& takenFrom) const
 {
 	THROW_EXCEPTION("Not implemented yet!");
 }
@@ -228,8 +228,7 @@ void CHeightGridMap2D::serializeFrom(
 			if (version >= 2) in >> genericMapParams;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 }
 
@@ -266,8 +265,7 @@ void CHeightGridMap2D::TInsertionOptions::loadFromConfigFile(
 	MRPT_LOAD_CONFIG_VAR(z_max, float, iniFile, section)
 	string aux = iniFile.read_string(section, "colorMap", "jet");
 
-	if (strCmp(aux, "jet"))
-		colorMap = cmJET;
+	if (strCmp(aux, "jet")) colorMap = cmJET;
 	else if (strCmp(aux, "grayscale"))
 		colorMap = cmGRAYSCALE;
 }
@@ -334,8 +332,7 @@ void CHeightGridMap2D::getAs3DObject(
 		// Find min/max:
 		float z_min, z_max;
 		float K;
-		if (this->getMinMaxHeight(z_min, z_max))
-			K = 1.0f / (z_max - z_min);
+		if (this->getMinMaxHeight(z_min, z_max)) K = 1.0f / (z_max - z_min);
 		else
 			K = 1.0f;
 
@@ -350,7 +347,7 @@ void CHeightGridMap2D::getAs3DObject(
 					float r, g, b;
 					const float col_idx = (c->h - z_min) * K;
 					colormap(
-						insertionOptions.colorMap,  // cmJET, //cmGRAYSCALE,
+						insertionOptions.colorMap,	// cmJET, //cmGRAYSCALE,
 						col_idx, r, g, b);
 					obj->push_back(idx2x(x), idx2y(y), c->h, r, g, b);
 				}

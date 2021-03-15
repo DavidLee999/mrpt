@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -47,10 +47,7 @@ DECLARE_OP_FUNCTION(op_remove_label)
 		bool tellIfThisObsPasses(mrpt::obs::CObservation::Ptr& obs) override
 		{
 			for (const auto& m_filter_label : m_filter_labels)
-				if (obs->sensorLabel == m_filter_label)
-				{
-					return false;
-				}
+				if (obs->sensorLabel == m_filter_label) { return false; }
 			return true;
 		}
 	};
@@ -108,10 +105,7 @@ DECLARE_OP_FUNCTION(op_keep_label)
 		bool tellIfThisObsPasses(mrpt::obs::CObservation::Ptr& obs) override
 		{
 			for (const auto& m_filter_label : m_filter_labels)
-				if (obs->sensorLabel == m_filter_label)
-				{
-					return true;
-				}
+				if (obs->sensorLabel == m_filter_label) { return true; }
 			return false;
 		}
 	};

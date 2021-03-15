@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -273,12 +273,9 @@ class CPose2D : public CPose<CPose2D, 3>,
 	{
 		switch (i)
 		{
-			case 0:
-				return m_coords[0];
-			case 1:
-				return m_coords[1];
-			case 2:
-				return m_phi;
+			case 0: return m_coords[0];
+			case 1: return m_coords[1];
+			case 2: return m_phi;
 			default:
 				throw std::runtime_error(
 					"CPose2D::operator[]: Index of bounds.");
@@ -288,12 +285,9 @@ class CPose2D : public CPose<CPose2D, 3>,
 	{
 		switch (i)
 		{
-			case 0:
-				return m_coords[0];
-			case 1:
-				return m_coords[1];
-			case 2:
-				return m_phi;
+			case 0: return m_coords[0];
+			case 1: return m_coords[1];
+			case 2: return m_phi;
 			default:
 				throw std::runtime_error(
 					"CPose2D::operator[]: Index of bounds.");
@@ -358,7 +352,7 @@ class CPose2D : public CPose<CPose2D, 3>,
 
 	/** @} */
 
-};  // End of class def.
+};	// End of class def.
 
 std::ostream& operator<<(std::ostream& o, const CPose2D& p);
 

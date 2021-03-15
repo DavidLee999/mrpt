@@ -2,14 +2,14 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "rawlog-edit-declarations.h"
-
 #include <mrpt/obs/CObservationWindSensor.h>
+
+#include "rawlog-edit-declarations.h"
 
 using namespace mrpt;
 using namespace mrpt::obs;
@@ -62,11 +62,10 @@ DECLARE_OP_FUNCTION(op_export_anemometer_txt)
 
 			if (it == lstFiles.end())  // A new file for this sensorlabel??
 			{
-				const std::string fileName =
-					m_filPrefix + string("_") +
-					fileNameStripInvalidChars(
-						obs->sensorLabel.empty() ? string("ANEMOMETER")
-												 : obs->sensorLabel) +
+				const std::string fileName = m_filPrefix + string("_") +
+					fileNameStripInvalidChars(obs->sensorLabel.empty()
+												  ? string("ANEMOMETER")
+												  : obs->sensorLabel) +
 					string(".txt");
 
 				VERBOSE_COUT << "Writing anemometer TXT file: " << fileName
@@ -83,7 +82,7 @@ DECLARE_OP_FUNCTION(op_export_anemometer_txt)
 				::fprintf(
 					f_this,
 					"%% "
-					"%14s "  // TIMESTAMP
+					"%14s "	 // TIMESTAMP
 					"%18s %18s "  // WIND (mod, direction)
 					"\n",
 					"Time", "WIND_MODULE(m/s)", "WIND_DIRECTION (deg)");

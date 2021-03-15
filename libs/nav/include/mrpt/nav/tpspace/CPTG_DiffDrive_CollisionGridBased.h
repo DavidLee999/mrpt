@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -205,12 +205,12 @@ class CPTG_DiffDrive_CollisionGridBased : public CPTG_RobotShape_Polygonal
 			const unsigned int icx, const unsigned int icy, const uint16_t k,
 			const float dist);
 
-	};  // end of class CCollisionGrid
+	};	// end of class CCollisionGrid
 
 	// Save/Load from files.
 	bool saveColGridsToFile(
 		const std::string& filename,
-		const mrpt::math::CPolygon& computed_robotShape) const;  // true = OK
+		const mrpt::math::CPolygon& computed_robotShape) const;	 // true = OK
 	bool loadColGridsFromFile(
 		const std::string& filename,
 		const mrpt::math::CPolygon& current_robotShape);  // true = OK

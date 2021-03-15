@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -18,6 +18,7 @@
 #include <mrpt/serialization/CSerializable.h>
 #include <mrpt/system/CObservable.h>
 #include <mrpt/tfest/TMatchingPair.h>
+
 #include <deque>
 
 namespace mrpt::maps
@@ -66,7 +67,8 @@ class CMetricMap : public mrpt::serialization::CSerializable,
 	/** Internal method called by computeObservationLikelihood() */
 	virtual double internal_computeObservationLikelihood(
 		const mrpt::obs::CObservation& obs,
-		const mrpt::poses::CPose3D& takenFrom) = 0;
+		const mrpt::poses::CPose3D& takenFrom) const = 0;
+
 	/** Internal method called by canComputeObservationLikelihood() */
 	virtual bool internal_canComputeObservationLikelihood([
 		[maybe_unused]] const mrpt::obs::CObservation& obs) const
@@ -139,12 +141,7 @@ class CMetricMap : public mrpt::serialization::CSerializable,
 	 */
 	double computeObservationLikelihood(
 		const mrpt::obs::CObservation& obs,
-		const mrpt::poses::CPose3D& takenFrom);
-
-	/** \overload */
-	double computeObservationLikelihood(
-		const mrpt::obs::CObservation& obs,
-		const mrpt::poses::CPose2D& takenFrom);
+		const mrpt::poses::CPose3D& takenFrom) const;
 
 	/** Returns true if this map is able to compute a sensible likelihood
 	 * function for this observation (i.e. an occupancy grid map cannot with an
@@ -167,7 +164,7 @@ class CMetricMap : public mrpt::serialization::CSerializable,
 	 */
 	double computeObservationsLikelihood(
 		const mrpt::obs::CSensoryFrame& sf,
-		const mrpt::poses::CPose2D& takenFrom);
+		const mrpt::poses::CPose3D& takenFrom);
 
 	/** Returns true if this map is able to compute a sensible likelihood
 	 * function for this observation (i.e. an occupancy grid map cannot with an
@@ -302,10 +299,6 @@ class CMetricMap : public mrpt::serialization::CSerializable,
 			const_cast<const CMetricMap*>(this)->getAsSimplePointsMap());
 	}
 
-};  // End of class def.
-
-/** A list of metric maps (used in the mrpt::poses::CPosePDFParticles class):
- */
-using TMetricMapList = std::deque<CMetricMap*>;
+};	// End of class def.
 
 }  // namespace mrpt::maps

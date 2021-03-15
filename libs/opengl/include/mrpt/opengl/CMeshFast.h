@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -161,9 +161,7 @@ class CMeshFast : public CRenderizableShaderPoints
 		CRenderizable::notifyChange();
 	}
 
-	void getBoundingBox(
-		mrpt::math::TPoint3D& bb_min,
-		mrpt::math::TPoint3D& bb_max) const override;
+	mrpt::math::TBoundingBox getBoundingBox() const override;
 
 	/** Assigns a texture image, and disable transparency.
 	 */
@@ -184,7 +182,7 @@ class CMeshFast : public CRenderizableShaderPoints
 		const float ycenter = 0.5f * (yMin + yMax);
 		const float xwidth = xMax - xMin;
 		const float newratio = float(m_textureImage.getWidth()) /
-							   float(m_textureImage.getHeight());
+			float(m_textureImage.getHeight());
 		yMax = ycenter + 0.5f * newratio * xwidth;
 		yMin = ycenter - 0.5f * newratio * xwidth;
 		CRenderizable::notifyChange();

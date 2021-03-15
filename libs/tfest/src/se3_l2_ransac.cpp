@@ -2,21 +2,21 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "tfest-precomp.h"  // Precompiled headers
-
-#include <mrpt/tfest/se3.h>
-
+#include "tfest-precomp.h"	// Precompiled headers
+//
 #include <mrpt/core/round.h>
 #include <mrpt/math/utils.h>  // linspace()
 #include <mrpt/poses/CPose3D.h>
 #include <mrpt/poses/CPose3DQuat.h>
 #include <mrpt/poses/Lie/SO.h>
 #include <mrpt/random.h>
+#include <mrpt/tfest/se3.h>
+
 #include <iostream>
 #include <numeric>
 
@@ -71,7 +71,7 @@ bool tfest::se3_l2_robust(
 		const auto rub = mrpt::math::linspace<uint32_t>(0, nCorrs - 1, nCorrs);
 		const auto mbSet = getRandomGenerator().permuteVector(rub);
 
-		std::vector<uint32_t> cSet;  // consensus set
+		std::vector<uint32_t> cSet;	 // consensus set
 
 		// Compute first inliers output
 		TMatchingPairList mbInliers;
@@ -194,7 +194,7 @@ bool tfest::se3_l2_robust(
 			CPose3DQuat cIOutQuat;
 			res = mrpt::tfest::se3_l2(
 				cSetInliers, cIOutQuat, scale,
-				params.forceScaleToUnity);  // Compute output
+				params.forceScaleToUnity);	// Compute output
 			ASSERTMSG_(
 				res,
 				"tfest::se3_l2() returned false for tentative subset during "

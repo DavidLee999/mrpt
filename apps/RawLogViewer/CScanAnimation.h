@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -19,13 +19,13 @@
 #include <wx/spinctrl.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+
 #include "MyGLCanvas.h"
 //*)
 
 // The "custom class" mpWindow, from the wxMathPlot libray by David Schalig
 //  See http://sourceforge.net/projects/wxmathplot
 #include <mrpt/3rdparty/mathplot/mathplot.h>
-
 #include <mrpt/obs/CSensoryFrame.h>
 #include <mrpt/opengl/CPointCloudColoured.h>
 

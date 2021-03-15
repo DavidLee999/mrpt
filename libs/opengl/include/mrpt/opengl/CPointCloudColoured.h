@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -69,11 +69,11 @@ class CPointCloudColoured : public CRenderizableShaderPoints,
    public:
 	/** Evaluates the bounding box of this object (including possible children)
 	 * in the coordinate frame of the object parent. */
-	void getBoundingBox(
-		mrpt::math::TPoint3D& bb_min,
-		mrpt::math::TPoint3D& bb_max) const override
+	mrpt::math::TBoundingBox getBoundingBox() const override
 	{
-		this->octree_getBoundingBox(bb_min, bb_max);
+		if (auto bb = this->octree_getBoundingBox(); bb) return *bb;
+		else
+			return {};
 	}
 
 	/** @name Read/Write of the list of points to render
@@ -302,8 +302,9 @@ class PointCloudAdapter<mrpt::opengl::CPointCloudColoured>
 		const float Rf, const float Gf, const float Bf, const float Af)
 	{
 		m_obj.setPoint(
-			idx, mrpt::math::TPointXYZfRGBAu8(
-					 x, y, z, f2u8(Rf), f2u8(Gf), f2u8(Bf), f2u8(Af)));
+			idx,
+			mrpt::math::TPointXYZfRGBAu8(
+				x, y, z, f2u8(Rf), f2u8(Gf), f2u8(Bf), f2u8(Af)));
 	}
 
 	/** Get XYZ_RGBu8 coordinates of i'th point */
@@ -357,7 +358,7 @@ class PointCloudAdapter<mrpt::opengl::CPointCloudColoured>
 		m_obj.setPointColor_u8_fast(idx, r, g, b);
 	}
 
-};  // end of PointCloudAdapter<mrpt::opengl::CPointCloudColoured>
+};	// end of PointCloudAdapter<mrpt::opengl::CPointCloudColoured>
 
 // After declaring the adapter we can here implement this method:
 template <class POINTSMAP>

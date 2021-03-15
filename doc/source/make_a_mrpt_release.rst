@@ -14,8 +14,8 @@ useful to someone else maintaining MRPT in the future... ;-)
 - Go to MRPT dir.
 - Edit ``doc/source/doxygen-docs/changelog.md`` and set the release date.
 - Do the final ``git commit`` before the release.
-- ``bash scripts/prepare_release.sh``
-- ``bash scripts/prepare_debian.sh``
+- ``bash packaging/prepare_release.sh``
+- ``bash packaging/prepare_debian.sh``
 
 The packages are in ``$(HOME)/mrpt_release`` and ``$(HOME)/mrpt_debian``
 
@@ -34,14 +34,13 @@ via AppVeyor CI.
 - Edit changelog
 - Build package:
 
-.. code-block: bash
+.. code-block:: bash
 
-   cd ~/mrpt_debian/
-   gpg --armor --detach-sign  mrpt_*.tar.xz
-   cd mrpt-*
+   cd ~/mrpt_debian/mrpt-*
    debuild -S -sa
    cd ..
    lintian *.changes
+
 
 3) Test build in Debian Unstable
 ---------------------------------------

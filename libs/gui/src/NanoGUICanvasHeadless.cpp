@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "gui-precomp.h"  // Precompiled headers
-
+//
 #include <mrpt/gui/internal/NanoGUICanvasHeadless.h>
 
 using namespace mrpt::gui;
@@ -35,8 +35,7 @@ void NanoGUICanvasHeadless::mouseMotionEvent(
 
 		if (leftIsDown)
 		{
-			if (modifiers & GLFW_MOD_SHIFT)
-				updateZoom(params, X, Y);
+			if (modifiers & GLFW_MOD_SHIFT) updateZoom(params, X, Y);
 			else if (modifiers & GLFW_MOD_CONTROL)
 				updateRotate(params, X, Y);
 			else
@@ -66,4 +65,4 @@ void NanoGUICanvasHeadless::scrollEvent(
 	setCameraParams(params);
 }
 
-#endif  // MRPT_HAS_NANOGUI
+#endif	// MRPT_HAS_NANOGUI

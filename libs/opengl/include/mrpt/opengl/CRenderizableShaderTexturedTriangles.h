@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -104,6 +104,9 @@ class CRenderizableShaderTexturedTriangles : public virtual CRenderizable
 	/** List of triangles  \sa TTriangle */
 	mutable std::vector<mrpt::opengl::TTriangle> m_triangles;
 
+	/** Returns the bounding box of m_triangles, or (0,0,0)-(0,0,0) if empty. */
+	const mrpt::math::TBoundingBox trianglesBoundingBox() const;
+
 	void writeToStreamTexturedObject(mrpt::serialization::CArchive& out) const;
 	void readFromStreamTexturedObject(mrpt::serialization::CArchive& in);
 
@@ -112,6 +115,7 @@ class CRenderizableShaderTexturedTriangles : public virtual CRenderizable
 
 	mutable unsigned int m_glTextureName{0};
 	mutable bool m_texture_is_loaded{false};
+	mutable bool m_texture_is_pending_destruction{false};
 	bool m_textureImageAssigned = false;
 	mutable mrpt::img::CImage m_textureImage{4, 4};
 	mutable mrpt::img::CImage m_textureImageAlpha;

@@ -1,11 +1,109 @@
 \page changelog Change Log
 
-# Version 2.1.5: (Under development)
+# Version 2.2.1: UNRELEASED
+- Changes in libraries:
+  - \ref mrpt_graphs_grp
+    - mrpt::graphs::CDijkstra now no longer requires a field `nodes` in input graphs.
+- BUG FIXES:
+  - ptg-configurator: Fix failure to list existing PTGs, due to RTTI unregistered name "CParameterizedTrajectoryGenerator".
+  - mrpt::opengl::COpenGLViewport::get3DRayForPixelCoord() returned wrong pixel coordinates when in orthogonal projection mode.
+
+------
+# Version 2.2.0: Released March 10th, 2021
+- Changes in libraries:
+  - \ref mrpt_vision_grp
+    - Remove all obsolete `SIFTOptions.implementation` values. `OpenCV` is now the only possibility.
+  - \ref mrpt_nav_grp
+    - mrpt::nav::TWaypoint now uses std::optional instead of magic numbers in some fields.
+    - mrpt::nav::TWaypoint now has std::any fields to hold user-given extra data.
+- BUG FIXES:
+  - Fix invalid bounding box returned by octree_getBoundingBox() and mrpt::opengl point cloud classes when empty (Closes [#1145](https://github.com/MRPT/mrpt/issues/1145)).
+  - Fix potential infinite recursion in exceptions with stack trace (Closes [#1141](https://github.com/MRPT/mrpt/issues/1141)).
+  - Fix potential race conditions accessing waypoint lists in mrpt::nav::CWaypointsNavigator
+  - Fix build errors with gcc-11.
+
+------
+# Version 2.1.8: Released Feb 23rd, 2021
+- Changes in applications:
+  - RawLogViewer:
+    - "Scan animation" window: now also shows the timestamp of observations.
+  - camera-calib and kinect-stereo-calib:
+    - New option to save camera calibration results as YAML files.
+  - navlog-viewer:
+    - New option to enable orthogonal view.
+- General build changes:
+  - Fix excessive alignment in aarch64 (32->16 bytes).
+  - clang-format: enforce and upgraded to use clang-format-10.
+  - Fix building against the non-legacy GL library (Linux).
+  - nanoflann source code is no longer included as a copy: it will be used as the system library libnanoflann-dev, or as a git submodule if the former is not found.
+- Changes in libraries:
+  - \ref mrpt_containers_grp
+    - New YAML to/from matrix methods: mrpt::containers::yaml::FromMatrix(), mrpt::containers::yaml::toMatrix()
+  - \ref mrpt_core_grp
+    - New CMake build flags `MRPT_EXCEPTIONS_WITH_CALL_STACK` to optionally disable reporting call stacks upon exceptions and `MRPT_EXCEPTIONS_CALL_STACK_MAX_DEPTH` to set their maximum depth.
+  - \ref mrpt_hwdrivers_grp
+    - mrpt::hwdrivers::CHokuyoURG now has a parameter for communications timeout (`comms_timeout_ms`).
+  - \ref mrpt_math_grp
+    - New class mrpt::math::TBoundingBox
+  - \ref mrpt_maps_grp
+      - Const correctness fixed in all mrpt::maps::CMetricMap classes.
+  - \ref mrpt_opengl_grp
+    - mrpt::opengl::CFrustum() new constructor from mrpt::img::TCamera()
+  - \ref mrpt_poses_grp
+    - mrpt::poses::CPose3D: Add more syntactic sugger static constructors.
+  - \ref mrpt_slam_grp
+    - mrpt::slam::TMonteCarloLocalizationParams map parameters are now shared pointers instead of plain pointers for safer code.
+- BUG FIXES:
+  - Log `*_THROTTLE_*` macros (e.g. MRPT_LOG_THROTTLE_DEBUG) did not report the message the first time they were called, which seems a safer behavior.
+  - Reverted changed behavior: mrpt::config::CConfigFile did not throw if a non-existing file was passed to its constructor, but it throws in MRPT 2.1.{0-7}.
+  - Fix build against opencv 2.4.x (version in Ubuntu Xenial 16.04).
+  - Fixed: CHokuyoURG::initialize() won't report sensor status as ssError if it fails to communicate with the sensor, incorrectly leaving it as ssInitializing instead.
+  - Fixed: mrpt::opengl::CTexturedPlane::setPlaneCorners() did not check for incorrect null width or height.
+  - Fixed: mrpt::opengl textured objects leaking memory (Closes [#1136](https://github.com/MRPT/mrpt/issues/1136)).
+  - Fix bug in parsing CARMEN logs: mrpt::obs::carmen_log_parse_line() returned all scan ranges marked as "invalid".
+
+------
+# Version 2.1.7: Released Jan 2nd, 2021
+- BUG FIXES:
+  - Fix bash syntax error in PPA release scripts.
+  - Fix [Debian bug #978209](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=978209): FTBFS: mainwindow.h:218:2: error: reference to Tracker is ambiguous
+
+------
+# Version 2.1.6: Released Dec 14th, 2020
+- Changes in libraries:
+  - \ref mrpt_core_grp
+    - Disable the use of BFD for symbols in stack traces by default in Debian builds. It is still used if found in the system and in Ubuntu PPAs.
+- BUG FIXES:
+  - Fix [Debian bug #976803](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=976803): mrpt uses private binutils shared library.
+  - Fix [Debian bug #977247](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=977247]): fail to link pymrpt against opencv.
+
+------
+# Version 2.1.5: Released Dec 6th, 2020
 - Changes in libraries:
   - \ref mrpt_containers_grp
     - Both mrpt::containers::CDynamicGrid and mrpt::containers::CDynamicGrid3D are now compatible with range-based for loops, and also have a data() method.
+  - \ref mrpt_core_grp
+    - Added mrpt::LockHelper::unlock()
+    - Added mrpt::Clock::nowDouble()
+    - New method mrpt::WorkerThreadsPool::name()
+    - Function mrpt::system::callStackBackTrace() moved to mrpt::callStackBackTrace()
+    - mrpt::callStackBackTrace() now uses BFD to find out line numbers if debug info (at least -g1) is available.
+    - Stacked exceptions changes:
+      - Line numbers will be now shown if built with debug info (>= -g1).
+      - Exceptions in STL or any other 3rd-party library will be also reported with exact call point line number, as long as MRPT_START/MRPT_END is used in the user function.
+      - No further need to call mrpt::exception_to_str(), just calling what() will return a detailed stack backtrace.
+      - New function mrpt::winerror2str()
+  - \ref mrpt_gui_grp
+    - New method mrpt::gui::CGlCanvasBase::CamaraParams::FromCamera()
+  - \ref mrpt_math_grp
+    - Added missing method for consistent API across pose classes: mrpt::math::TPose3D::operator+()
+  - \ref mrpt_system_grp
+    - mrpt::system::COutputLogger::writeLogToFile() will now save *all* messages despite the runtime log verbosity level.
 - BUG FIXES:
   - Fix error rendering an opengl scene with mrpt::opengl::CCamera objects in it.
+  - rawlog-edit silently ignored when more than one operation was requested.
+  - Fix FTBFS against libjsoncpp 1.9.4 (Closes [#1118](https://github.com/MRPT/mrpt/issues/1118))
+  - Fix AppStream errors and warnings in Debian Tracker.
 
 ------
 # Version 2.1.4: Released Nov 8th, 2020
@@ -381,7 +479,7 @@ CObservation3DRangeScan::convertTo2DScan()
 <h2>Version 1.5.3: Released 13/AUG/2017  </h2></a>
 - <b>Detailed list of changes:</b>
   - CMake >=3.1 is now required for use of ExternalProjects.
-  - Scripts `scripts/prepare_{debian,release}.sh` have been refactored and
+  - Scripts `packaging/prepare_{debian,release}.sh` have been refactored and
 simplified.
   - Removed embedded source code versions of Eigen, assimp and octomap.
 Downloaded and built as ExternalProjects if not present in the system.

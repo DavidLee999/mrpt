@@ -2,12 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 #pragma once
 
+#include <cstddef>	// size_t
 #include <map>
 #include <vector>
 
@@ -90,8 +91,8 @@ class map_as_vector
 		@{ */
 	//!< Default constructor - does nothing */
 	inline map_as_vector() = default;
-	/** Copy constructor */
-	inline map_as_vector(const map_as_vector<KEY, VALUE>& o) : m_vec(o.m_vec) {}
+	/** Copy constructor & operator= -> default */
+
 	inline size_t size() const { return m_vec.size(); }
 	inline bool empty() const { return m_vec.empty(); }
 	/** Count how many entries have a given key value - unlike std::map<K,V>,
@@ -137,8 +138,7 @@ class map_as_vector
 	 * vector) */
 	inline iterator find(const size_t i)
 	{
-		if (i < m_vec.size())
-			return m_vec.begin() + i;
+		if (i < m_vec.size()) return m_vec.begin() + i;
 		else
 			return m_vec.end();
 	}
@@ -147,14 +147,13 @@ class map_as_vector
 	 * vector) */
 	inline const_iterator find(const size_t i) const
 	{
-		if (i < m_vec.size())
-			return m_vec.begin() + i;
+		if (i < m_vec.size()) return m_vec.begin() + i;
 		else
 			return m_vec.end();
 	}
 
 	/** @} */
 
-};  // end class map_as_vector
+};	// end class map_as_vector
 
 }  // namespace mrpt::containers

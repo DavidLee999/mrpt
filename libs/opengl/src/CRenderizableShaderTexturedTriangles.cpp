@@ -2,22 +2,23 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
+#include "opengl-precomp.h"	 // Precompiled header
+//
+#include <mrpt/core/lock_helper.h>
 #include <mrpt/opengl/CRenderizableShaderTexturedTriangles.h>
 #include <mrpt/opengl/TLightParameters.h>
+#include <mrpt/opengl/opengl_api.h>
 #include <mrpt/serialization/CArchive.h>
 #include <mrpt/system/CTimeLogger.h>
+
 #include <iostream>
 #include <memory>  // std::align
 #include <thread>
-
-#include <mrpt/opengl/opengl_api.h>
 
 using namespace mrpt;
 using namespace mrpt::opengl;
@@ -274,6 +275,16 @@ void CRenderizableShaderTexturedTriangles::initializeTextures() const
 	static mrpt::system::CTimeLogger tim;
 #endif
 
+	// Destroy a former texture, if it was freed:
+	// It's important we do this from the very same thread from which it was
+	// reserved:
+	if (m_texture_is_pending_destruction)
+	{
+		m_texture_is_pending_destruction = false;
+		releaseTextureName(m_glTextureName);
+		m_glTextureName = 0;
+	}
+
 	// Do nothing until we are assigned an image.
 	if (m_textureImage.isEmpty()) return;
 
@@ -427,7 +438,7 @@ void CRenderizableShaderTexturedTriangles::initializeTextures() const
 				GL_TEXTURE_2D, 0 /*level*/, GL_RGBA8 /* RGB components */,
 				width, height, 0 /*border*/, img_format, img_type, dataAligned);
 			CHECK_OPENGL_ERROR();
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);  // Reset
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);	 // Reset
 			CHECK_OPENGL_ERROR();
 
 		}  // End of color texture WITH trans.
@@ -445,12 +456,9 @@ void CRenderizableShaderTexturedTriangles::initializeTextures() const
 			const GLenum img_format = [=]() {
 				switch (nBytesPerPixel)
 				{
-					case 1:
-						return GL_LUMINANCE;
-					case 3:
-						return (is_RGB_order ? GL_RGB : GL_BGR);
-					case 4:
-						return GL_BGRA;
+					case 1: return GL_LUMINANCE;
+					case 3: return (is_RGB_order ? GL_RGB : GL_BGR);
+					case 4: return GL_BGRA;
 				};
 				THROW_EXCEPTION("Invalid texture image channel count.");
 			}();
@@ -468,7 +476,7 @@ void CRenderizableShaderTexturedTriangles::initializeTextures() const
 				width, height, 0 /*border*/, img_format, img_type,
 				m_textureImage.ptrLine<uint8_t>(0));
 			CHECK_OPENGL_ERROR();
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);  // Reset
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);	 // Reset
 			CHECK_OPENGL_ERROR();
 
 		}  // End of color texture WITHOUT trans.
@@ -534,8 +542,7 @@ void CRenderizableShaderTexturedTriangles::unloadTexture()
 	if (m_texture_is_loaded)
 	{
 		m_texture_is_loaded = false;
-		releaseTextureName(m_glTextureName);
-		m_glTextureName = 0;
+		m_texture_is_pending_destruction = true;
 	}
 }
 
@@ -575,52 +582,127 @@ void CRenderizableShaderTexturedTriangles::readFromStreamTexturedObject(
 			{
 				assignImage(m_textureImage);
 			}
-			if (version >= 1)
-				in >> m_textureImageAssigned;
+			if (version >= 1) in >> m_textureImageAssigned;
 			else
 				m_textureImageAssigned = true;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 	CRenderizable::notifyChange();
 }
 
-static std::map<unsigned int, std::thread::id> textureReservedFrom;
+/** This class is a workaround to crashes and memory leaks caused by not
+ * reserving and freeing opengl textures from the same thread. */
+class TextureResourceHandler
+{
+   public:
+	static TextureResourceHandler& Instance()
+	{
+		static TextureResourceHandler o;
+		return o;
+	}
+
+	unsigned int generateTextureID()
+	{
+#if MRPT_HAS_OPENGL_GLUT
+		auto lck = mrpt::lockHelper(m_texturesMtx);
+
+		processDestroyQueue();
+
+		// Create one OpenGL texture
+		GLuint textureID;
+		glGenTextures(1, &textureID);
+		CHECK_OPENGL_ERROR();
+		m_textureReservedFrom[textureID] = std::this_thread::get_id();
+
+		return textureID;
+#else
+		THROW_EXCEPTION("This function needs OpenGL");
+#endif
+	}
+
+	void releaseTextureID(unsigned int id)
+	{
+#if MRPT_HAS_OPENGL_GLUT
+		auto lck = mrpt::lockHelper(m_texturesMtx);
+
+		m_destroyQueue[std::this_thread::get_id()].push_back(id);
+		processDestroyQueue();
+#endif
+	}
+
+   private:
+	TextureResourceHandler() = default;
+
+	void processDestroyQueue()
+	{
+#if MRPT_HAS_OPENGL_GLUT
+		if (auto itLst = m_destroyQueue.find(std::this_thread::get_id());
+			itLst != m_destroyQueue.end())
+		{
+			auto& lst = itLst->second;
+			glDeleteTextures(lst.size(), lst.data());
+			CHECK_OPENGL_ERROR();
+			lst.clear();
+		}
+#endif
+	}
+
+#if MRPT_HAS_OPENGL_GLUT
+	std::mutex m_texturesMtx;
+	std::map<GLuint, std::thread::id> m_textureReservedFrom;
+	std::map<std::thread::id, std::vector<GLuint>> m_destroyQueue;
+#endif
+};
 
 unsigned int CRenderizableShaderTexturedTriangles::getNewTextureNumber()
 {
-	MRPT_START
-#if MRPT_HAS_OPENGL_GLUT
-	// Create one OpenGL texture
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-
-	textureReservedFrom[textureID] = std::this_thread::get_id();
-	return textureID;
-#else
-	THROW_EXCEPTION("This function needs OpenGL");
-#endif
-	MRPT_END
+	return TextureResourceHandler::Instance().generateTextureID();
 }
 
 void CRenderizableShaderTexturedTriangles::releaseTextureName(unsigned int i)
 {
-	MRPT_START
-#if MRPT_HAS_OPENGL_GLUT
+	TextureResourceHandler::Instance().releaseTextureID(i);
+}
 
-	auto it = textureReservedFrom.find(i);
-	if (it == textureReservedFrom.end()) return;
+const mrpt::math::TBoundingBox
+	CRenderizableShaderTexturedTriangles::trianglesBoundingBox() const
+{
+	mrpt::math::TBoundingBox bb;
 
-	if (std::this_thread::get_id() == it->second)
+	if (m_triangles.empty()) return bb;
+
+	bb.min = mrpt::math::TPoint3D(
+		std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
+		std::numeric_limits<double>::max());
+	bb.max = mrpt::math::TPoint3D(
+		-std::numeric_limits<double>::max(),
+		-std::numeric_limits<double>::max(),
+		-std::numeric_limits<double>::max());
+
+	for (const auto& t : m_triangles)
 	{
-		GLuint t = i;
-		glDeleteTextures(1, &t);
-		CHECK_OPENGL_ERROR();
-	}
+		keep_min(bb.min.x, t.x(0));
+		keep_max(bb.max.x, t.x(0));
+		keep_min(bb.min.y, t.y(0));
+		keep_max(bb.max.y, t.y(0));
+		keep_min(bb.min.z, t.z(0));
+		keep_max(bb.max.z, t.z(0));
 
-	textureReservedFrom.erase(it);
-#endif
-	MRPT_END
+		keep_min(bb.min.x, t.x(1));
+		keep_max(bb.max.x, t.x(1));
+		keep_min(bb.min.y, t.y(1));
+		keep_max(bb.max.y, t.y(1));
+		keep_min(bb.min.z, t.z(1));
+		keep_max(bb.max.z, t.z(1));
+
+		keep_min(bb.min.x, t.x(2));
+		keep_max(bb.max.x, t.x(2));
+		keep_min(bb.min.y, t.y(2));
+		keep_max(bb.max.y, t.y(2));
+		keep_min(bb.min.z, t.z(2));
+		keep_max(bb.max.z, t.z(2));
+	}
+	return bb;
 }

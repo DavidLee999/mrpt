@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/io/CFileGZInputStream.h>
 #include <mrpt/io/CFileGZOutputStream.h>
 #include <mrpt/maps/CColouredPointsMap.h>
@@ -18,6 +18,7 @@
 #include <mrpt/obs/CObservationPointCloud.h>
 #include <mrpt/serialization/CArchive.h>
 #include <mrpt/system/filesystem.h>
+
 #include <fstream>
 #include <iostream>
 
@@ -45,13 +46,11 @@ void CObservationPointCloud::getDescriptionAsText(std::ostream& o) const
 	CObservation::getDescriptionAsText(o);
 	o << "Homogeneous matrix for the sensor pose wrt vehicle:\n";
 	o << sensorPose.getHomogeneousMatrixVal<mrpt::math::CMatrixDouble44>()
-	  << sensorPose << std::endl;
+	  << "\n"
+	  << sensorPose << "\n";
 
 	o << "Pointcloud class: ";
-	if (!this->pointcloud)
-	{
-		o << "nullptr\n";
-	}
+	if (!this->pointcloud) { o << "nullptr\n"; }
 	else
 	{
 		o << pointcloud->GetRuntimeClass()->className << "\n";
@@ -73,10 +72,7 @@ void CObservationPointCloud::serializeTo(
 	out << sensorPose;
 	out.WriteAs<uint8_t>(m_externally_stored);
 
-	if (isExternallyStored())
-	{
-		out << m_external_file;
-	}
+	if (isExternallyStored()) { out << m_external_file; }
 	else
 	{
 		out << pointcloud;
@@ -91,16 +87,13 @@ void CObservationPointCloud::serializeFrom(
 		case 0:
 		{
 			pointcloud.reset();
-			in >> sensorLabel >> timestamp;  // Base class data
+			in >> sensorLabel >> timestamp;	 // Base class data
 
 			in >> sensorPose;
 			m_externally_stored =
 				static_cast<ExternalStorageFormat>(in.ReadPOD<uint8_t>());
 
-			if (isExternallyStored())
-			{
-				in >> m_external_file;
-			}
+			if (isExternallyStored()) { in >> m_external_file; }
 			else
 			{
 				m_external_file.clear();
@@ -108,8 +101,7 @@ void CObservationPointCloud::serializeFrom(
 			}
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 }
 
@@ -124,17 +116,17 @@ void CObservationPointCloud::load() const
 
 	switch (m_externally_stored)
 	{
-		case ExternalStorageFormat::None:
-			break;
+		case ExternalStorageFormat::None: break;
 		case ExternalStorageFormat::KittiBinFile:
 		{
 			auto pts = mrpt::maps::CPointsMapXYZI::Create();
 			bool ok = pts->loadFromKittiVelodyneFile(abs_filename);
 			ASSERTMSG_(
-				ok, mrpt::format(
-						"[kitti format] Error loading lazy-load point cloud "
-						"file: '%s'",
-						abs_filename.c_str()));
+				ok,
+				mrpt::format(
+					"[kitti format] Error loading lazy-load point cloud "
+					"file: '%s'",
+					abs_filename.c_str()));
 			auto pc = std::dynamic_pointer_cast<mrpt::maps::CPointsMap>(pts);
 			const_cast<mrpt::maps::CPointsMap::Ptr&>(pointcloud) = pc;
 		}
@@ -191,10 +183,11 @@ void CObservationPointCloud::load() const
 			const_cast<mrpt::maps::CPointsMap::Ptr&>(pointcloud) = pc;
 
 			ASSERTMSG_(
-				pointcloud, mrpt::format(
-								"[mrpt-serialization format] Error loading "
-								"lazy-load point cloud file: %s",
-								abs_filename.c_str()));
+				pointcloud,
+				mrpt::format(
+					"[mrpt-serialization format] Error loading "
+					"lazy-load point cloud file: %s",
+					abs_filename.c_str()));
 		}
 		break;
 	};
@@ -212,8 +205,7 @@ void CObservationPointCloud::unload()
 		{
 			switch (m_externally_stored)
 			{
-				case ExternalStorageFormat::None:
-					break;
+				case ExternalStorageFormat::None: break;
 				case ExternalStorageFormat::KittiBinFile:
 				{
 					THROW_EXCEPTION("Saving to kitti format not supported.");
@@ -226,7 +218,8 @@ void CObservationPointCloud::unload()
 					for (size_t i = 0; i < pointcloud->size(); i++)
 					{
 						pointcloud->getPointAllFieldsFast(i, row);
-						for (const float v : row) f << v << " ";
+						for (const float v : row)
+							f << v << " ";
 						f << "\n";
 					}
 				}

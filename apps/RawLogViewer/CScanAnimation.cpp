@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -13,7 +13,7 @@
 #include <wx/string.h>
 //*)
 
-#ifdef None  // X header conflict...
+#ifdef None	 // X header conflict...
 #undef None
 #endif
 
@@ -24,7 +24,6 @@
 #include <mrpt/opengl/CGridPlaneXY.h>
 #include <mrpt/opengl/CPlanarLaserScan.h>  // in library mrpt-maps
 #include <mrpt/opengl/stock_objects.h>
-
 #include <wx/app.h>
 #include <wx/busyinfo.h>
 #include <wx/log.h>
@@ -329,7 +328,8 @@ void CScanAnimation::BuildMapAndRefresh(CSensoryFrame* sf)
 	WX_START_TRY
 
 	// load from disk if needed:
-	for (auto& it : *sf) it->load();
+	for (auto& it : *sf)
+		it->load();
 
 	// Mix?
 	if (!m_mixlasers)
@@ -448,15 +448,13 @@ void CScanAnimation::BuildMapAndRefresh(CSensoryFrame* sf)
 			}
 
 			// Load as RGB or grayscale points:
-			if (pointMapCol)
-				gl_obj->loadFromPointsMap(pointMapCol.get());
+			if (pointMapCol) gl_obj->loadFromPointsMap(pointMapCol.get());
 			else
 			{
 				gl_obj->loadFromPointsMap(pointMap.get());
-				mrpt::math::TPoint3D bbmin, bbmax;
-				gl_obj->getBoundingBox(bbmin, bbmax);
+				const auto bb = gl_obj->getBoundingBox();
 				gl_obj->recolorizeByCoordinate(
-					bbmax.x, bbmin.x, 0 /*color by x*/, mrpt::img::cmJET);
+					bb.max.x, bb.min.x, 0 /*color by x*/, mrpt::img::cmJET);
 			}
 
 			// Add to list:
@@ -545,13 +543,11 @@ void CScanAnimation::BuildMapAndRefresh(CSensoryFrame* sf)
 		TRenderObject& ro = o.second;
 
 		if ((tim_last == INVALID_TIMESTAMP &&
-			 wereScans)  // Scans without timestamps
+			 wereScans)	 // Scans without timestamps
 			|| (tim_last != INVALID_TIMESTAMP &&
 				fabs(mrpt::system::timeDifference(ro.timestamp, tim_last)) >
 					largest_period))
-		{
-			lst_to_delete.push_back(o.first);
-		}
+		{ lst_to_delete.push_back(o.first); }
 	}
 
 	// Remove too old observations:
@@ -560,15 +556,25 @@ void CScanAnimation::BuildMapAndRefresh(CSensoryFrame* sf)
 		TRenderObject& ro = m_gl_objects[s];
 		m_plot3D->getOpenGLSceneRef()->removeObject(
 			ro.obj);  // Remove from the opengl viewport
-		m_gl_objects.erase(s);  // and from my list
+		m_gl_objects.erase(s);	// and from my list
 	}
+
+	// Show timestamp:
+	m_plot3D->getOpenGLSceneRef()->getViewport()->addTextMessage(
+		5, 5,
+		mrpt::format(
+			"Timestamp (UTC): %s (%.06f)",
+			mrpt::system::dateTimeToString(tim_last).c_str(),
+			mrpt::Clock::toDouble(tim_last)),
+		0 /*id*/);
 
 	// Force refresh view:
 	m_plot3D->setCameraProjective(!cbViewOrtho->IsChecked());
 	m_plot3D->Refresh();
 
 	// Post-process: unload 3D observations.
-	for (auto& o : *sf) o->unload();
+	for (auto& o : *sf)
+		o->unload();
 
 	WX_END_TRY
 }
@@ -594,7 +600,7 @@ void CScanAnimation::OnbtnPlayClick(wxCommandEvent& event)
 		while (!m_stop)
 		{
 			int idx = slPos->GetValue();
-			if (idx >= ((int)rawlog.size()) - 1) break;  // End!
+			if (idx >= ((int)rawlog.size()) - 1) break;	 // End!
 
 			if (rawlog.getType(idx) != CRawlog::etActionCollection)
 			{

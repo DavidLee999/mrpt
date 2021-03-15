@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/opengl/CPlanarLaserScan.h>
 #include <mrpt/serialization/CArchive.h>
 
@@ -119,7 +119,8 @@ void CPlanarLaserScan::onUpdateBuffers_Points()
 	const float *x, *y, *z;
 	m_cache_points.getPointsBuffer(n, x, y, z);
 
-	for (size_t i = 0; i < n; i++) vbd.emplace_back(x[i], y[i], z[i]);
+	for (size_t i = 0; i < n; i++)
+		vbd.emplace_back(x[i], y[i], z[i]);
 
 	cbd.assign(
 		vbd.size(),
@@ -176,13 +177,11 @@ void CPlanarLaserScan::serializeFrom(
 			}
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 }
 
-void CPlanarLaserScan::getBoundingBox(
-	mrpt::math::TPoint3D& bb_min, mrpt::math::TPoint3D& bb_max) const
+auto CPlanarLaserScan::getBoundingBox() const -> mrpt::math::TBoundingBox
 {
 	// Load into cache:
 	if (!m_cache_valid)
@@ -198,34 +197,36 @@ void CPlanarLaserScan::getBoundingBox(
 	size_t n;
 	const float *x, *y, *z;
 
-	m_cache_points.getPointsBuffer(n, x, y, z);
-	if (!n || !x) return;
+	mrpt::math::TBoundingBox bb;
 
-	bb_min = mrpt::math::TPoint3D(
+	m_cache_points.getPointsBuffer(n, x, y, z);
+	if (!n || !x) return bb;
+
+	bb.min = mrpt::math::TPoint3D(
 		std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
 		std::numeric_limits<double>::max());
-	bb_max = mrpt::math::TPoint3D(
+	bb.max = mrpt::math::TPoint3D(
 		-std::numeric_limits<double>::max(),
 		-std::numeric_limits<double>::max(),
 		-std::numeric_limits<double>::max());
 
 	for (size_t i = 0; i < n; i++)
 	{
-		keep_min(bb_min.x, x[i]);
-		keep_max(bb_max.x, x[i]);
-		keep_min(bb_min.y, y[i]);
-		keep_max(bb_max.y, y[i]);
-		keep_min(bb_min.z, z[i]);
-		keep_max(bb_max.z, z[i]);
+		keep_min(bb.min.x, x[i]);
+		keep_max(bb.max.x, x[i]);
+		keep_min(bb.min.y, y[i]);
+		keep_max(bb.max.y, y[i]);
+		keep_min(bb.min.z, z[i]);
+		keep_max(bb.max.z, z[i]);
 	}
 
 	// Convert to coordinates of my parent:
-	m_pose.composePoint(bb_min, bb_min);
-	m_pose.composePoint(bb_max, bb_max);
+	return bb.compose(m_pose);
 }
 
 mrpt::math::TPoint3Df CPlanarLaserScan::getLocalRepresentativePoint() const
 {
-	return {d2f(m_scan.sensorPose.x()), d2f(m_scan.sensorPose.y()),
-			d2f(m_scan.sensorPose.z())};
+	return {
+		d2f(m_scan.sensorPose.x()), d2f(m_scan.sensorPose.y()),
+		d2f(m_scan.sensorPose.z())};
 }

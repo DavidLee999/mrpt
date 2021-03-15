@@ -2,16 +2,17 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "poses-precomp.h"  // Precompiled headers
-
+#include "poses-precomp.h"	// Precompiled headers
+//
 #include <mrpt/poses/CPoint.h>
 #include <mrpt/poses/CPoint2D.h>
 #include <mrpt/poses/CPoint3D.h>
+
 #include <iostream>
 
 using namespace mrpt::poses;
@@ -32,13 +33,13 @@ template <class DERIVEDCLASS, std::size_t DIM>
 void CPoint<DERIVEDCLASS, DIM>::asString(std::string& s) const
 {
 	s = (!DERIVEDCLASS::is3DPoseOrPoint())
-			? mrpt::format(
-				  "[%f %f]", static_cast<const DERIVEDCLASS*>(this)->x(),
-				  static_cast<const DERIVEDCLASS*>(this)->y())
-			: mrpt::format(
-				  "[%f %f %f]", static_cast<const DERIVEDCLASS*>(this)->x(),
-				  static_cast<const DERIVEDCLASS*>(this)->y(),
-				  static_cast<const DERIVEDCLASS*>(this)->m_coords[2]);
+		? mrpt::format(
+			  "[%f %f]", static_cast<const DERIVEDCLASS*>(this)->x(),
+			  static_cast<const DERIVEDCLASS*>(this)->y())
+		: mrpt::format(
+			  "[%f %f %f]", static_cast<const DERIVEDCLASS*>(this)->x(),
+			  static_cast<const DERIVEDCLASS*>(this)->y(),
+			  static_cast<const DERIVEDCLASS*>(this)->m_coords[2]);
 }
 
 namespace mrpt::poses

@@ -2,13 +2,14 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 #pragma once
 
 #include <mrpt/core/common.h>  // MRPT_printf_format_check
+
 #include <cstdint>
 #include <string>
 
@@ -93,7 +94,7 @@ class CStream
 	 * \sa CStdOutStream
 	 */
 	virtual int printf(const char* fmt, ...)
-		MRPT_printf_format_check(2, 3);  // The first argument (1) is "this" !!!
+		MRPT_printf_format_check(2, 3);	 // The first argument (1) is "this" !!!
 
 	/** Prints a vector in the format [A,B,C,...] using CStream::printf, and the
 	 * fmt string for <b>each</b> vector element `T`.
@@ -118,6 +119,6 @@ class CStream
 	 */
 	bool getline(std::string& out_str);
 
-};  // End of class def.
+};	// End of class def.
 
 }  // namespace mrpt::io

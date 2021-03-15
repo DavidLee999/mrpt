@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -177,7 +177,7 @@ class CPose3DPDFGaussianInf : public CPose3DPDF
 	 */
 	double mahalanobisDistanceTo(const CPose3DPDFGaussianInf& theOther);
 
-};  // End of class def.
+};	// End of class def.
 bool operator==(
 	const CPose3DPDFGaussianInf& p1, const CPose3DPDFGaussianInf& p2);
 /** Pose composition for two 3D pose Gaussians  \sa CPose3DPDFGaussian::operator

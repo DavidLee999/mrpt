@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -14,6 +14,7 @@
 #include <mrpt/random/RandomGenerators.h>
 #include <mrpt/system/filesystem.h>
 #include <test_mrpt_common.h>
+
 #include <algorithm>  // std::equal
 
 const size_t tst_data_len = 1000U;
@@ -45,8 +46,7 @@ TEST(CFileGZStreams, readwriteTmpFileCompressed)
 	for (int compress_level = 1; compress_level <= 9; compress_level++)
 	{
 		const std::string fil = mrpt::system::getTempFileName() +
-								std::string("_") +
-								std::to_string(compress_level);
+			std::string("_") + std::to_string(compress_level);
 		// Write:
 		{
 			mrpt::io::CFileGZOutputStream fil_out;

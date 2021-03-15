@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
+#include "opengl-precomp.h"	 // Precompiled header
+//
 #include <mrpt/math/geometry.h>
 #include <mrpt/opengl/CArrow.h>
 #include <mrpt/serialization/CArchive.h>
@@ -117,7 +117,8 @@ void CArrow::onUpdateBuffers_Triangles()
 	}
 
 	// All faces, same color:
-	for (auto& t : tris) t.setColor(m_color);
+	for (auto& t : tris)
+		t.setColor(m_color);
 }
 
 uint8_t CArrow::serializeGetVersion() const { return 2; }
@@ -150,8 +151,7 @@ void CArrow::serializeFrom(mrpt::serialization::CArchive& in, uint8_t version)
 			if (version >= 2) in >> m_slices;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 	CRenderizable::notifyChange();
 }
@@ -191,22 +191,15 @@ void CArrow::serializeFrom(mrpt::serialization::CSchemeArchiveBase& in)
 			m_slices = static_cast<unsigned int>(in["slices"]);
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
-void CArrow::getBoundingBox(
-	mrpt::math::TPoint3D& bb_min, mrpt::math::TPoint3D& bb_max) const
+auto CArrow::getBoundingBox() const -> mrpt::math::TBoundingBox
 {
-	bb_min.x = std::min(m_x0, m_x1);
-	bb_min.y = std::min(m_y0, m_y1);
-	bb_min.z = std::min(m_z0, m_z1);
-
-	bb_max.x = std::max(m_x0, m_x1);
-	bb_max.y = std::max(m_y0, m_y1);
-	bb_max.z = std::max(m_z0, m_z1);
-
-	// Convert to coordinates of my parent:
-	m_pose.composePoint(bb_min, bb_min);
-	m_pose.composePoint(bb_max, bb_max);
+	return mrpt::math::TBoundingBox(
+			   {std::min(m_x0, m_x1), std::min(m_y0, m_y1),
+				std::min(m_z0, m_z1)},
+			   {std::max(m_x0, m_x1), std::max(m_y0, m_y1),
+				std::max(m_z0, m_z1)})
+		.compose(m_pose);
 }

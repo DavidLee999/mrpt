@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -10,6 +10,7 @@
 
 #include <mrpt/core/Clock.h>
 #include <mrpt/core/exceptions.h>
+
 #include <cstdint>
 #include <iosfwd>
 #include <string>
@@ -42,19 +43,18 @@ using TTimeStamp = mrpt::Clock::time_point;
 /** Represents an invalid timestamp, where applicable. */
 #define INVALID_TIMESTAMP mrpt::Clock::time_point()
 
-/** The parts of a date/time (it's like the standard 'tm' but with fractions of
- * seconds).
- * \sa TTimeStamp, timestampToParts, buildTimestampFromParts
+/** The parts of a date/time, like the standard `tm` but with fractional
+ * (`double`) seconds. \sa TTimeStamp, timestampToParts, buildTimestampFromParts
  */
 struct TTimeParts
 {
-	uint16_t year{0}; /** The year */
-	uint8_t month{0}; /** Month (1-12) */
-	uint8_t day{0}; /** Day (1-31) */
-	uint8_t hour{0}; /** Hour (0-23) */
-	uint8_t minute{0}; /** Minute (0-59) */
-	double second{0}; /** Seconds (0.0000-59.9999) */
-	uint8_t day_of_week{0}; /** Day of week (1:Sunday, 7:Saturday) */
+	uint16_t year{0};  //!< The year (e.g. 2021)
+	uint8_t month{0};  //!< Month (1-12)
+	uint8_t day{0};	 //!<  Day (1-31)
+	uint8_t hour{0};  //!<  Hour (0-23)
+	uint8_t minute{0};	//!<  Minute (0-59)
+	double second{0};  //!<  Seconds (0.0000-59.9999)
+	uint8_t day_of_week{0};	 //!< Day of week (1:Sunday, 7:Saturday)
 	int daylight_saving{0};
 };
 
@@ -127,9 +127,9 @@ inline double timeDifference(
 	MRPT_START
 	ASSERT_(t_later != INVALID_TIMESTAMP);
 	ASSERT_(t_first != INVALID_TIMESTAMP);
-	return 1e-6 * std::chrono::duration_cast<std::chrono::microseconds>(
-					  t_later - t_first)
-					  .count();
+	return 1e-6 *
+		std::chrono::duration_cast<std::chrono::microseconds>(t_later - t_first)
+			.count();
 	MRPT_END
 }
 
@@ -147,7 +147,7 @@ inline mrpt::system::TTimeStamp timestampAdd(
 	const mrpt::system::TTimeStamp tim, const double num_seconds)
 {
 	return tim +
-		   std::chrono::microseconds(static_cast<int64_t>(num_seconds * 1e6));
+		std::chrono::microseconds(static_cast<int64_t>(num_seconds * 1e6));
 }
 
 /** Returns a formated string with the given time difference (passed as the

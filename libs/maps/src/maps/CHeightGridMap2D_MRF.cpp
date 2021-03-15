@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/maps/CHeightGridMap2D_MRF.h>
 #include <mrpt/poses/CPose2D.h>
 #include <mrpt/poses/CPose3D.h>
@@ -152,7 +152,7 @@ bool CHeightGridMap2D_MRF::internal_insertObservation(
   ---------------------------------------------------------------*/
 double CHeightGridMap2D_MRF::internal_computeObservationLikelihood(
 	[[maybe_unused]] const CObservation& obs,
-	[[maybe_unused]] const CPose3D& takenFrom)
+	[[maybe_unused]] const CPose3D& takenFrom) const
 {
 	THROW_EXCEPTION("Not implemented yet!");
 }
@@ -254,8 +254,7 @@ void CHeightGridMap2D_MRF::serializeFrom(
 			m_hasToRecoverMeanAndCov = true;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 }
 

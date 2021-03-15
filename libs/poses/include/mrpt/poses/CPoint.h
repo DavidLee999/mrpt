@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -95,19 +95,17 @@ class CPoint : public CPoseOrPoint<DERIVEDCLASS, DIM>
 	inline double& operator[](unsigned int i) { return derived().m_coords[i]; }
 	/** @} */
 
-};  // End of class def.
+};	// End of class def.
 
 /** Used by STL algorithms */
 template <class DERIVEDCLASS, std::size_t DIM>
 bool operator<(
 	const CPoint<DERIVEDCLASS, DIM>& a, const CPoint<DERIVEDCLASS, DIM>& b)
 {
-	if (a.x() < b.x())
-		return true;
+	if (a.x() < b.x()) return true;
 	else
 	{
-		if (!a.is3DPoseOrPoint())
-			return a.y() < b.y();
+		if (!a.is3DPoseOrPoint()) return a.y() < b.y();
 		else if (a.y() < b.y())
 			return true;
 		else

@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -54,7 +54,7 @@ class CGasConcentrationGridMap2D : public CRandomFieldGridMap2D
 			const mrpt::config::CConfigFileBase& source,
 			const std::string& section) override;  // See base docs
 		void dumpToTextStream(
-			std::ostream& out) const override;  // See base docs
+			std::ostream& out) const override;	// See base docs
 
 		/** @name For all mapping methods
 			@{ */
@@ -71,7 +71,7 @@ class CGasConcentrationGridMap2D : public CRandomFieldGridMap2D
 
 		//[Advection Options]
 		bool useWindInformation{
-			false};  //! Indicates if wind information must be used
+			false};	 //! Indicates if wind information must be used
 		//! to simulate Advection
 		float advectionFreq;  //! Frequency for simulating advection (only used
 		//! to transform wind speed to distance)
@@ -81,7 +81,7 @@ class CGasConcentrationGridMap2D : public CRandomFieldGridMap2D
 		//! measurements
 		float default_wind_direction{0.0f},
 			default_wind_speed{
-				1.0f};  //! The default value for the wind information
+				1.0f};	//! The default value for the wind information
 
 		/** @} */
 
@@ -110,8 +110,8 @@ class CGasConcentrationGridMap2D : public CRandomFieldGridMap2D
 	// Params for the estimation of the gaussian volume in a cell.
 	struct TGaussianCell
 	{
-		int cx = 0;  // x-index of the cell
-		int cy = 0;  // y-index of the cell
+		int cx = 0;	 // x-index of the cell
+		int cy = 0;	 // y-index of the cell
 		float value = 0;  // volume approximation
 	};
 
@@ -120,12 +120,12 @@ class CGasConcentrationGridMap2D : public CRandomFieldGridMap2D
 	{
 		// Fixed params
 		float resolution = 0;  // Cell_resolution. To be read from config-file
-		float std_phi = 0;  // to be read from config-file
+		float std_phi = 0;	// to be read from config-file
 		float std_r = 0;  // to be read from config-file
 
 		// unsigned int subcell_count; //subcell_count x subcell_count	subcells
 		// float subcell_res;
-		float phi_inc = 0;  // rad
+		float phi_inc = 0;	// rad
 		unsigned int phi_count = 0;
 		float r_inc = 0;  // m
 		float max_r = 0;  // maximum distance (m)
@@ -152,7 +152,7 @@ class CGasConcentrationGridMap2D : public CRandomFieldGridMap2D
 		const mrpt::poses::CPose3D* robotPose = nullptr) override;
 	double internal_computeObservationLikelihood(
 		const mrpt::obs::CObservation& obs,
-		const mrpt::poses::CPose3D& takenFrom) override;
+		const mrpt::poses::CPose3D& takenFrom) const override;
 
 	/** Builds a LookUp table with the values of the Gaussian Weights result of
 	 * the wind advection

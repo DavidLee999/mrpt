@@ -2,12 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include <mrpt/vision/CStereoRectifyMap.h>
+
 #include "rawlog-edit-declarations.h"
 
 using namespace mrpt;
@@ -81,8 +82,8 @@ DECLARE_OP_FUNCTION(op_stereo_rectify)
 			outDir = (out_rawlog_basedir.empty()
 						  ? string()
 						  : (out_rawlog_basedir + string("/"))) +
-					 extractFileName(outrawlog.out_rawlog_filename) +
-					 string("_Images");
+				extractFileName(outrawlog.out_rawlog_filename) +
+				string("_Images");
 			if (directoryExists(outDir))
 				throw runtime_error(
 					string("*ABORTING*: Output directory for rectified images "
@@ -164,16 +165,16 @@ DECLARE_OP_FUNCTION(op_stereo_rectify)
 							"%s_%f", o->sensorLabel.c_str(),
 							timestampTotime_t(o->timestamp));
 						{
-							const string fileName =
-								string("img_") + label_time + string("_left.") +
+							const string fileName = string("img_") +
+								label_time + string("_left.") +
 								imgFileExtension;
 							o->imageLeft.saveToFile(outDir + fileName);
 							o->imageLeft.setExternalStorage(fileName);
 						}
 						{
-							const string fileName =
-								string("img_") + label_time +
-								string("_right.") + imgFileExtension;
+							const string fileName = string("img_") +
+								label_time + string("_right.") +
+								imgFileExtension;
 							o->imageRight.saveToFile(outDir + fileName);
 							o->imageRight.setExternalStorage(fileName);
 						}
@@ -214,8 +215,7 @@ DECLARE_OP_FUNCTION(op_stereo_rectify)
 			if (!m_this_obs_is_ok) return;
 
 			ASSERT_((actions && SF) || obs);
-			if (actions)
-				(*outrawlog.out_rawlog) << actions << SF;
+			if (actions) (*outrawlog.out_rawlog) << actions << SF;
 			else
 				(*outrawlog.out_rawlog) << obs;
 		}

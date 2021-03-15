@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -17,6 +17,9 @@
 
 namespace mrpt::math
 {
+/** \addtogroup  geometry_grp
+ * @{ */
+
 /**
  * Standard object for storing any 3D lightweight object. Do not inherit from
  * this class.
@@ -191,25 +194,15 @@ struct TObject3D
 		destroy();
 		switch (type = obj.type)
 		{
-			case GEOMETRIC_TYPE_POINT:
-				data.point = obj.data.point;
-				break;
-			case GEOMETRIC_TYPE_SEGMENT:
-				data.segment = obj.data.segment;
-				break;
-			case GEOMETRIC_TYPE_LINE:
-				data.line = obj.data.line;
-				break;
+			case GEOMETRIC_TYPE_POINT: data.point = obj.data.point; break;
+			case GEOMETRIC_TYPE_SEGMENT: data.segment = obj.data.segment; break;
+			case GEOMETRIC_TYPE_LINE: data.line = obj.data.line; break;
 			case GEOMETRIC_TYPE_POLYGON:
 				data.polygon = new TPolygon3D(*(obj.data.polygon));
 				break;
-			case GEOMETRIC_TYPE_PLANE:
-				data.plane = obj.data.plane;
-				break;
-			case GEOMETRIC_TYPE_UNDEFINED:
-				break;
-			default:
-				THROW_EXCEPTION("Invalid TObject3D object");
+			case GEOMETRIC_TYPE_PLANE: data.plane = obj.data.plane; break;
+			case GEOMETRIC_TYPE_UNDEFINED: break;
+			default: THROW_EXCEPTION("Invalid TObject3D object");
 		}
 		return *this;
 	}
@@ -337,6 +330,8 @@ mrpt::serialization::CArchive& operator>>(
 	mrpt::serialization::CArchive& in, mrpt::math::TObject3D& o);
 mrpt::serialization::CArchive& operator<<(
 	mrpt::serialization::CArchive& out, const mrpt::math::TObject3D& o);
+
+/** @} */
 
 }  // namespace mrpt::math
 

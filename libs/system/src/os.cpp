@@ -2,22 +2,22 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "system-precomp.h"  // Precompiled headers
+#include "system-precomp.h"	 // Precompiled headers
 //
-
 #include <mrpt/core/exceptions.h>
 #include <mrpt/core/format.h>
+#include <mrpt/core/winerror2str.h>
 #include <mrpt/system/filesystem.h>
 #include <mrpt/system/os.h>
 #include <mrpt/system/string_utils.h>
 
 #ifndef HAVE_TIMEGM
-#endif  // HAVE_TIMEGM
+#endif	// HAVE_TIMEGM
 
 #include <algorithm>
 #include <cctype>
@@ -29,6 +29,7 @@
 #include <mutex>
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 //
 #include <conio.h>
@@ -149,7 +150,7 @@ time_t mrpt::system::os::timegm(struct tm* tm)
 }
 
 #endif
-#endif  // HAVE_TIMEGM
+#endif	// HAVE_TIMEGM
 
 /*---------------------------------------------------------------
 					mrpt::system::MRPT_getCompilationDate
@@ -270,8 +271,7 @@ FILE* os::fopen(const char* fileName, const char* mode) noexcept
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
 	// Use a secure version in Visual Studio 2005:
 	FILE* f;
-	if (0 != ::fopen_s(&f, fileName, mode))
-		return NULL;
+	if (0 != ::fopen_s(&f, fileName, mode)) return NULL;
 	else
 		return f;
 #else
@@ -570,21 +570,6 @@ const std::string& mrpt::system::getMRPTLicense()
 	return sLicenseText;
 }
 
-#ifdef _WIN32
-std::string winerror2str(const char* errorPlaceName)
-{
-	char str[700];
-	DWORD e = GetLastError();
-	FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, 0, e, 0, str, sizeof(str), NULL);
-	std::string s;
-	s = "[";
-	s += errorPlaceName;
-	s += "] Error: ";
-	s += str;
-	return s;
-}
-#endif
-
 /*---------------------------------------------------------------
 launchProcess
 ---------------------------------------------------------------*/
@@ -634,11 +619,11 @@ std::string mrpt::system::find_mrpt_shared_dir()
 			{
 				case 0:
 					dir = string(MRPT_SOURCE_BASE_DIRECTORY) +
-						  string("/share/mrpt/");
+						string("/share/mrpt/");
 					break;
 				case 1:
 					dir = string(MRPT_INSTALL_PREFIX_DIRECTORY) +
-						  string("/share/mrpt/");
+						string("/share/mrpt/");
 					break;
 #ifdef _WIN32
 				case 2:
@@ -648,14 +633,12 @@ std::string mrpt::system::find_mrpt_shared_dir()
 
 					dir = mrpt::system::extractFileDirectory(
 							  std::string(curExe)) +
-						  "/../share/mrpt/";
+						"/../share/mrpt/";
 				}
 				break;
 #endif
 
-				default:
-					found_mrpt_shared_dir = ".";
-					break;
+				default: found_mrpt_shared_dir = "."; break;
 			};
 			if (!dir.empty() && mrpt::system::directoryExists(dir))
 				found_mrpt_shared_dir = dir;
@@ -757,11 +740,11 @@ int mrpt::system::executeCommand(
 		// Create the child process.
 		bSuccess = CreateProcessA(
 			NULL,
-			(LPSTR)command.c_str(),  // command line
+			(LPSTR)command.c_str(),	 // command line
 			NULL,  // process security attributes
 			NULL,  // primary thread security attributes
 			TRUE,  // handles are inherited
-			0,  // creation flags
+			0,	// creation flags
 			NULL,  // use parent's environment
 			NULL,  // use parent's current directory
 			&siStartInfo,  // STARTUPINFO pointer
@@ -813,10 +796,7 @@ int mrpt::system::executeCommand(
 	}
 #endif
 	// set output - if valid pointer given
-	if (output)
-	{
-		*output = sout.str();
-	}
+	if (output) { *output = sout.str(); }
 
 	// Return exit code
 	return exit_code;
@@ -851,7 +831,8 @@ struct ModulesRegistry
 			auto lstCopy = loadedModules;
 			loadedModules_mtx.unlock();
 
-			for (auto& ent : lstCopy) unloadPluginModule(ent.first);
+			for (auto& ent : lstCopy)
+				unloadPluginModule(ent.first);
 		}
 		catch (const std::exception& e)
 		{
@@ -899,8 +880,7 @@ bool mrpt::system::loadPluginModule(
 		GetLastError());
 #endif
 
-	if (outErrorMsgs)
-		outErrorMsgs.value().get() += sError;
+	if (outErrorMsgs) outErrorMsgs.value().get() += sError;
 	else
 		std::cerr << sError;
 	return false;
@@ -919,7 +899,7 @@ bool mrpt::system::unloadPluginModule(
 	if (it == md.loadedModules.end())
 	{
 		sError = "Module filename '" + moduleFileName +
-				 "' not found in previous calls to loadPluginModule().";
+			"' not found in previous calls to loadPluginModule().";
 	}
 	else
 	{
@@ -942,8 +922,7 @@ bool mrpt::system::unloadPluginModule(
 
 	if (!sError.empty())
 	{
-		if (outErrorMsgs)
-			outErrorMsgs.value().get() += sError;
+		if (outErrorMsgs) outErrorMsgs.value().get() += sError;
 		else
 			std::cerr << sError;
 		return false;

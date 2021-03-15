@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -72,7 +72,7 @@ class CFileGZOutputStream : public CStream
 	uint64_t getTotalBytesCount() const override;
 	size_t Read(void* Buffer, size_t Count) override;
 	size_t Write(const void* Buffer, size_t Count) override;
-};  // End of class def.
+};	// End of class def.
 static_assert(
 	!std::is_copy_constructible_v<CFileGZOutputStream> &&
 		!std::is_copy_assignable_v<CFileGZOutputStream>,

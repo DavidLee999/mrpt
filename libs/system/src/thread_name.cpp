@@ -2,20 +2,21 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "system-precomp.h"  // Precompiled headers
+#include "system-precomp.h"	 // Precompiled headers
 //
 #include <mrpt/config.h>
 #include <mrpt/core/exceptions.h>
 #include <mrpt/system/thread_name.h>
 
 #if defined(MRPT_OS_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
+//
 #include <cwchar>
 #include <vector>
 

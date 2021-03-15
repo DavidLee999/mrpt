@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -11,6 +11,7 @@
 #include <mrpt/obs/CObservationImage.h>
 #include <mrpt/obs/CObservationPointCloud.h>
 #include <mrpt/obs/CObservationStereoImages.h>
+
 #include "rawlog-edit-declarations.h"
 
 using namespace mrpt;
@@ -34,7 +35,7 @@ DECLARE_OP_FUNCTION(op_deexternalize)
 
 	   public:
 		size_t entries_converted;
-		size_t entries_skipped;  // Already external
+		size_t entries_skipped;	 // Already external
 
 		CRawlogProcessor_DeExternalize(
 			CFileGZInputStream& in_rawlog, TCLAP::CmdLine& cmdline,
@@ -151,8 +152,7 @@ DECLARE_OP_FUNCTION(op_deexternalize)
 			mrpt::obs::CObservation::Ptr& obs) override
 		{
 			ASSERT_((actions && SF) || obs);
-			if (actions)
-				(*outrawlog.out_rawlog) << actions << SF;
+			if (actions) (*outrawlog.out_rawlog) << actions << SF;
 			else
 				(*outrawlog.out_rawlog) << obs;
 		}

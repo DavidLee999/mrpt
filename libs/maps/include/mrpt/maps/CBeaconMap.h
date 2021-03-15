@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -60,7 +60,7 @@ class CBeaconMap : public mrpt::maps::CMetricMap
 		const mrpt::poses::CPose3D* robotPose = nullptr) override;
 	double internal_computeObservationLikelihood(
 		const mrpt::obs::CObservation& obs,
-		const mrpt::poses::CPose3D& takenFrom) override;
+		const mrpt::poses::CPose3D& takenFrom) const override;
 
    public:
 	/** Constructor */
@@ -114,7 +114,7 @@ class CBeaconMap : public mrpt::maps::CMetricMap
 			const mrpt::config::CConfigFileBase& source,
 			const std::string& section) override;  // See base docs
 		void dumpToTextStream(
-			std::ostream& out) const override;  // See base docs
+			std::ostream& out) const override;	// See base docs
 
 		/** The standard deviation used for Beacon ranges likelihood
 		 * (default=0.08m).
@@ -133,7 +133,7 @@ class CBeaconMap : public mrpt::maps::CMetricMap
 			const mrpt::config::CConfigFileBase& source,
 			const std::string& section) override;  // See base docs
 		void dumpToTextStream(
-			std::ostream& out) const override;  // See base docs
+			std::ostream& out) const override;	// See base docs
 
 		/** Insert a new beacon as a set of montecarlo samples (default=true),
 		 * or, if false, as a sum of gaussians (see mrpt::maps::CBeacon).
@@ -312,6 +312,6 @@ class CBeaconMap : public mrpt::maps::CMetricMap
 	mrpt::maps::CBeaconMap::TLikelihoodOptions likelihoodOpts;
 	MAP_DEFINITION_END(CBeaconMap)
 
-};  // End of class def.
+};	// End of class def.
 
 }  // namespace mrpt::maps

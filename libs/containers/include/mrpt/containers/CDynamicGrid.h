@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -83,8 +83,7 @@ class CDynamicGrid
 		m_size_y = round((m_y_max - m_y_min) / m_resolution);
 
 		// Cells memory:
-		if (fill_value)
-			m_map.assign(m_size_x * m_size_y, *fill_value);
+		if (fill_value) m_map.assign(m_size_x * m_size_y, *fill_value);
 		else
 			m_map.resize(m_size_x * m_size_y);
 	}
@@ -100,7 +99,8 @@ class CDynamicGrid
 	 */
 	inline void fill(const T& value)
 	{
-		for (auto it = m_map.begin(); it != m_map.end(); ++it) *it = value;
+		for (auto it = m_map.begin(); it != m_map.end(); ++it)
+			*it = value;
 	}
 
 	/** Changes the size of the grid, maintaining previous contents.
@@ -213,8 +213,7 @@ class CDynamicGrid
 	 */
 	inline T* cellByIndex(unsigned int cx, unsigned int cy)
 	{
-		if (cx >= m_size_x || cy >= m_size_y)
-			return nullptr;
+		if (cx >= m_size_x || cy >= m_size_y) return nullptr;
 		else
 			return &m_map[cx + cy * m_size_x];
 	}
@@ -224,8 +223,7 @@ class CDynamicGrid
 	 */
 	inline const T* cellByIndex(unsigned int cx, unsigned int cy) const
 	{
-		if (cx >= m_size_x || cy >= m_size_y)
-			return nullptr;
+		if (cx >= m_size_x || cy >= m_size_y) return nullptr;
 		else
 			return &m_map[cx + cy * m_size_x];
 	}
@@ -294,7 +292,8 @@ class CDynamicGrid
 		if (m_map.empty()) return;
 		const T* c = &m_map[0];
 		for (size_t cy = 0; cy < m_size_y; cy++)
-			for (size_t cx = 0; cx < m_size_x; cx++) m(cy, cx) = *c++;
+			for (size_t cx = 0; cx < m_size_x; cx++)
+				m(cy, cx) = *c++;
 	}
 
 	/** The user must implement this in order to provide "saveToTextFile" a way

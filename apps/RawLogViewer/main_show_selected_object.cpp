@@ -2,34 +2,30 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "xRawLogViewerMain.h"
-
-#include <mrpt/math/ops_matrices.h>  // << ops
-#include <mrpt/math/ops_vectors.h>  // << ops
+#include <mrpt/gui/CMyRedirector.h>
+#include <mrpt/math/ops_matrices.h>	 // << ops
+#include <mrpt/math/ops_vectors.h>	// << ops
 #include <mrpt/math/wrap2pi.h>
 #include <mrpt/opengl/CAxis.h>
 #include <mrpt/opengl/CPointCloudColoured.h>
 #include <mrpt/system/datetime.h>
 
-#include <mrpt/gui/CMyRedirector.h>
+#include "xRawLogViewerMain.h"
 
 #define MRPT_NO_WARN_BIG_HDR  // It's ok to include ALL hdrs here.
-#include <mrpt/obs.h>
-
-#include <mrpt/obs/CObservationRotatingScan.h>  // not included in obs.h since it's in mrpt-maps
-
+#include <mrpt/gui/WxUtils.h>
 #include <mrpt/maps/CColouredPointsMap.h>
 #include <mrpt/maps/CSimplePointsMap.h>
+#include <mrpt/obs.h>
+#include <mrpt/obs/CObservationRotatingScan.h>	// not included in obs.h since it's in mrpt-maps
 #include <mrpt/poses/CPosePDFParticles.h>
 
 #include <iomanip>
-
-#include <mrpt/gui/WxUtils.h>
 
 using namespace mrpt;
 using namespace mrpt::opengl;
@@ -53,7 +49,7 @@ void xRawLogViewerFrame::SelectObjectInTreeView(
 	{
 		Notebook1->ChangeSelection(0);
 
-		memo->Freeze();  // Freeze the window to prevent scrollbar jumping
+		memo->Freeze();	 // Freeze the window to prevent scrollbar jumping
 		memo->Clear();
 		{
 			CMyRedirector myRedirector(memo);
@@ -62,10 +58,7 @@ void xRawLogViewerFrame::SelectObjectInTreeView(
 			string s;
 			rawlog.getCommentText(s);
 
-			if (s.empty())
-			{
-				cout << "(The rawlog has no comments)" << endl;
-			}
+			if (s.empty()) { cout << "(The rawlog has no comments)" << endl; }
 			else
 			{
 				cout << s;
@@ -148,7 +141,7 @@ void xRawLogViewerFrame::SelectObjectInTreeView(
 		dummMap.getAllPoints(Xs, Ys);
 
 		lyScan2D->SetData(Xs, Ys);
-		plotScan2D->Fit();  // Update the window to show the new data fitted.
+		plotScan2D->Fit();	// Update the window to show the new data fitted.
 	}
 
 	if (classID == CLASS_ID(CObservationImage))
@@ -320,15 +313,13 @@ void xRawLogViewerFrame::SelectObjectInTreeView(
 
 		auto gl_pnts = mrpt::opengl::CPointCloudColoured::Create();
 		// Load as RGB or grayscale points:
-		if (pointMapCol)
-			gl_pnts->loadFromPointsMap(pointMapCol.get());
+		if (pointMapCol) gl_pnts->loadFromPointsMap(pointMapCol.get());
 		else
 		{
 			gl_pnts->loadFromPointsMap(pointMap.get());
-			mrpt::math::TPoint3D bbmin, bbmax;
-			gl_pnts->getBoundingBox(bbmin, bbmax);
+			const auto bb = gl_pnts->getBoundingBox();
 			gl_pnts->recolorizeByCoordinate(
-				bbmax.x, bbmin.x, 0 /*color by x*/, mrpt::img::cmJET);
+				bb.max.x, bb.min.x, 0 /*color by x*/, mrpt::img::cmJET);
 		}
 
 		// No need to further transform 3D points
@@ -342,8 +333,7 @@ void xRawLogViewerFrame::SelectObjectInTreeView(
 		// Update intensity image ======
 		{
 			CImage im;
-			if (obs->hasIntensityImage)
-				im = obs->intensityImage;
+			if (obs->hasIntensityImage) im = obs->intensityImage;
 			else
 				im.resize(10, 10, CH_GRAY);
 			wxImage* img = mrpt::gui::MRPTImage2wxImage(im);
@@ -379,7 +369,7 @@ void xRawLogViewerFrame::SelectObjectInTreeView(
 			if (img->IsOk()) bmp3Dobs_conf->SetBitmap(wxBitmap(*img));
 			bmp3Dobs_conf->Refresh();
 			delete img;
-			obs->confidenceImage.unload();  // For externally-stored datasets
+			obs->confidenceImage.unload();	// For externally-stored datasets
 		}
 		obs->unload();
 	}
@@ -475,9 +465,7 @@ catch (CExceptionExternalImageNotFound& e)
 			this, _("Choose the base directory for relative image paths"),
 			CImage::getImagesPathBase().c_str(), 0, wxDefaultPosition);
 		if (dirDialog.ShowModal() == wxID_OK)
-		{
-			CImage::setImagesPathBase(string(dirDialog.GetPath().mb_str()));
-		}
+		{ CImage::setImagesPathBase(string(dirDialog.GetPath().mb_str())); }
 	}
 }
 catch (const std::exception& e)

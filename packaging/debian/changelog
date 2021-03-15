@@ -1,3 +1,44 @@
+mrpt (1:2.2.0-1) unstable; urgency=medium
+
+  * Fix build errors with gcc-11 (Closes: #984246)
+  * New version of upstream sources.
+
+ -- José Luis Blanco Claraco <joseluisblancoc@gmail.com>  Wed, 10 Mar 2021 17:05:20 +0100
+
+mrpt (1:2.1.8-1) unstable; urgency=medium
+
+  * New version of upstream sources.
+  * Fix AppStream error.
+  * nanoflann is now a Debian project of its own (libnanoflann-dev),
+    use it as a dependency.
+
+ -- José Luis Blanco Claraco <joseluisblancoc@gmail.com>  Tue, 23 Feb 2021 12:22:06 +0100
+
+mrpt (1:2.1.7-1) unstable; urgency=medium
+
+  * Fix FTBFS: reference to ‘Tracker’ is ambiguous (Closes: #978209).
+  * New version of upstream sources.
+
+ -- José Luis Blanco Claraco <joseluisblancoc@gmail.com>  Sat, 02 Jan 2021 06:46:41 +0100
+
+mrpt (1:2.1.6-1) unstable; urgency=medium
+
+  * Drop dependencies on binutils-dev to avoid problems (see bug #976803).
+  * Fix mrpt uses private shared bfd library (Closes: #976803).
+  * Fix building mrpt against OpenCV 4.5.0 (Closes: #977247).
+  * Update debian/rules to ensure proper dh_clean behavior.
+  * New version of upstream sources.
+
+ -- José Luis Blanco Claraco <joseluisblancoc@gmail.com>  Mon, 14 Dec 2020 08:16:47 +0100
+
+mrpt (1:2.1.5-1) unstable; urgency=medium
+
+  * New version of upstream sources.
+  * Fix build against newer libjsoncpp (Closes: #976420).
+  * Fix AppStream warnings and errors (metainfo files licensed as MIT).
+
+ -- José Luis Blanco Claraco <joseluisblancoc@gmail.com>  Sun, 06 Dec 2020 18:49:18 +0100
+
 mrpt (1:2.1.4-1) unstable; urgency=medium
 
   * New version of upstream sources.

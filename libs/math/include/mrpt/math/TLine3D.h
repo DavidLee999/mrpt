@@ -2,17 +2,21 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 #pragma once
 
 #include <mrpt/math/TPoint3D.h>
+
 #include <array>
 
 namespace mrpt::math
 {
+/** \addtogroup  geometry_grp
+ * @{ */
+
 /** 3D line, represented by a base point and a director vector.
  * \sa TLine2D,TSegment3D,TPlane,TPolygon3D,TPoint3D
  */
@@ -60,7 +64,8 @@ struct TLine3D
 	/** Get director vector */
 	void getDirectorVector(double (&vector)[3]) const
 	{
-		for (size_t i = 0; i < 3; i++) vector[i] = director[i];
+		for (size_t i = 0; i < 3; i++)
+			vector[i] = director[i];
 	}
 	/** Get director vector (may be NOT unitary if not set so by the user) \sa
 	 * getUnitaryDirectorVector(), unitarize() */
@@ -94,6 +99,8 @@ mrpt::serialization::CArchive& operator<<(
 
 /** Text streaming function */
 std::ostream& operator<<(std::ostream& o, const TLine3D& p);
+
+/** @} */
 
 }  // namespace mrpt::math
 

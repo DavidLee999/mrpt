@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
+#include "opengl-precomp.h"	 // Precompiled header
+//
 #include <mrpt/opengl/CFBORender.h>
 #include <mrpt/opengl/opengl_api.h>
 
@@ -157,9 +157,7 @@ void CFBORender::getFrame(
 	if (buffer.getWidth() != static_cast<size_t>(m_width) ||
 		buffer.getHeight() != static_cast<size_t>(m_height) ||
 		buffer.getChannelCount() != 3)
-	{
-		buffer.resize(m_width, m_height, mrpt::img::CH_RGB);
-	}
+	{ buffer.resize(m_width, m_height, mrpt::img::CH_RGB); }
 
 	// Go on.
 	getFrame2(scene, buffer);
@@ -196,10 +194,7 @@ void CFBORender::getFrame2(
 		0, 0, m_width, m_height, GL_BGR_EXT, GL_UNSIGNED_BYTE, buffer(0, 0));
 
 	// Flip vertically if needed:
-	if (buffer.isOriginTopLeft())
-	{
-		buffer.flipVertical();
-	}
+	if (buffer.isOriginTopLeft()) { buffer.flipVertical(); }
 
 	//'unbind' the frambuffer object, so subsequent drawing ops are not drawn
 	// into the FBO.

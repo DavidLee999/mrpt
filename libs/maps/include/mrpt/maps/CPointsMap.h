@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -16,12 +16,14 @@
 #include <mrpt/maps/CMetricMap.h>
 #include <mrpt/math/CMatrixFixed.h>
 #include <mrpt/math/KDTreeCapable.h>
+#include <mrpt/math/TBoundingBox.h>
 #include <mrpt/math/TPoint3D.h>
 #include <mrpt/obs/CSinCosLookUpTableFor2DScans.h>
 #include <mrpt/obs/obs_frwds.h>
 #include <mrpt/opengl/PLY_import_export.h>
 #include <mrpt/opengl/pointcloud_adapters.h>
 #include <mrpt/serialization/CSerializable.h>
+
 #include <iosfwd>
 
 // Add for declaration of mexplus::from template specialization
@@ -227,7 +229,7 @@ class CPointsMap : public CMetricMap,
 			const mrpt::config::CConfigFileBase& source,
 			const std::string& section) override;  // See base docs
 		void dumpToTextStream(
-			std::ostream& out) const override;  // See base docs
+			std::ostream& out) const override;	// See base docs
 
 		/** The minimum distance between points (in 3D): If two points are too
 		 * close, one of them is not inserted into the map. Default is 0.02
@@ -287,7 +289,7 @@ class CPointsMap : public CMetricMap,
 			const mrpt::config::CConfigFileBase& source,
 			const std::string& section) override;  // See base docs
 		void dumpToTextStream(
-			std::ostream& out) const override;  // See base docs
+			std::ostream& out) const override;	// See base docs
 
 		/** Binary dump to stream - for usage in derived classes' serialization
 		 */
@@ -317,7 +319,7 @@ class CPointsMap : public CMetricMap,
 			const mrpt::config::CConfigFileBase& source,
 			const std::string& section) override;  // See base docs
 		void dumpToTextStream(
-			std::ostream& out) const override;  // See base docs
+			std::ostream& out) const override;	// See base docs
 
 		/** Binary dump to stream - used in derived classes' serialization */
 		void writeToStream(mrpt::serialization::CArchive& out) const;
@@ -930,21 +932,29 @@ class CPointsMap : public CMetricMap,
 	 *  Results are cached unless the map is somehow modified to avoid repeated
 	 * calculations.
 	 */
-	void boundingBox(
-		float& min_x, float& max_x, float& min_y, float& max_y, float& min_z,
-		float& max_z) const;
+	mrpt::math::TBoundingBoxf boundingBox() const;
 
-	inline void boundingBox(
+	/// \overload
+	[[deprecated]] inline void boundingBox(
+		float& min_x, float& max_x, float& min_y, float& max_y, float& min_z,
+		float& max_z) const
+	{
+		const auto bb = boundingBox();
+		min_x = bb.min.x;
+		max_x = bb.max.x;
+		min_y = bb.min.y;
+		max_y = bb.max.y;
+		min_z = bb.min.z;
+		max_z = bb.max.z;
+	}
+
+	/// \overload
+	[[deprecated]] inline void boundingBox(
 		mrpt::math::TPoint3D& pMin, mrpt::math::TPoint3D& pMax) const
 	{
-		float dmy1, dmy2, dmy3, dmy4, dmy5, dmy6;
-		boundingBox(dmy1, dmy2, dmy3, dmy4, dmy5, dmy6);
-		pMin.x = dmy1;
-		pMin.y = dmy3;
-		pMin.z = dmy5;
-		pMax.x = dmy2;
-		pMax.y = dmy4;
-		pMax.z = dmy6;
+		const auto bb = boundingBox();
+		pMin = bb.min;
+		pMax = bb.max;
 	}
 
 	/** Extracts the points in the map within a cylinder in 3D defined the
@@ -997,11 +1007,11 @@ class CPointsMap : public CMetricMap,
 	// See docs in base class
 	double internal_computeObservationLikelihood(
 		const mrpt::obs::CObservation& obs,
-		const mrpt::poses::CPose3D& takenFrom) override;
+		const mrpt::poses::CPose3D& takenFrom) const override;
 
 	double internal_computeObservationLikelihoodPointCloud3D(
 		const mrpt::poses::CPose3D& pc_in_map, const float* xs, const float* ys,
-		const float* zs, const std::size_t num_pts);
+		const float* zs, const std::size_t num_pts) const;
 
 	/** @name PCL library support
 		@{ */
@@ -1069,8 +1079,7 @@ class CPointsMap : public CMetricMap,
 	/// Returns the dim'th component of the idx'th point in the class:
 	inline float kdtree_get_pt(const size_t idx, int dim) const
 	{
-		if (dim == 0)
-			return m_x[idx];
+		if (dim == 0) return m_x[idx];
 		else if (dim == 1)
 			return m_y[idx];
 		else if (dim == 2)
@@ -1108,13 +1117,15 @@ class CPointsMap : public CMetricMap,
 	template <typename BBOX>
 	bool kdtree_get_bbox(BBOX& bb) const
 	{
-		float min_z, max_z;
-		this->boundingBox(
-			bb[0].low, bb[0].high, bb[1].low, bb[1].high, min_z, max_z);
+		const auto bbox = this->boundingBox();
+		bb[0].low = bbox.min.x;
+		bb[1].low = bbox.min.y;
+		bb[0].high = bbox.max.x;
+		bb[1].high = bbox.max.y;
 		if (bb.size() == 3)
 		{
-			bb[2].low = min_z;
-			bb[2].high = max_z;
+			bb[2].low = bbox.min.z;
+			bb[2].high = bbox.max.z;
 		}
 		return true;
 	}
@@ -1148,8 +1159,7 @@ class CPointsMap : public CMetricMap,
 	mutable bool m_largestDistanceFromOriginIsUpdated;
 
 	mutable bool m_boundingBoxIsUpdated;
-	mutable float m_bb_min_x, m_bb_max_x, m_bb_min_y, m_bb_max_y, m_bb_min_z,
-		m_bb_max_z;
+	mutable mrpt::math::TBoundingBoxf m_boundingBox;
 
 	/** This is a common version of CMetricMap::insertObservation() for point
 	 * maps (actually, CMetricMap::internal_insertObservation),
@@ -1204,7 +1214,7 @@ class CPointsMap : public CMetricMap,
 	template <class Derived>
 	friend struct detail::pointmap_traits;
 
-};  // End of class def.
+};	// End of class def.
 
 }  // namespace maps
 
@@ -1256,6 +1266,6 @@ class PointCloudAdapter<mrpt::maps::CPointsMap>
 	{
 		m_obj.setPointFast(idx, 0, 0, 0);
 	}
-};  // end of PointCloudAdapter<mrpt::maps::CPointsMap>
+};	// end of PointCloudAdapter<mrpt::maps::CPointsMap>
 }  // namespace opengl
 }  // namespace mrpt

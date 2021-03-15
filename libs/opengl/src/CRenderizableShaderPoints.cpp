@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
+#include "opengl-precomp.h"	 // Precompiled header
+//
 #include <mrpt/opengl/CRenderizableShaderPoints.h>
 #include <mrpt/opengl/Shader.h>
 #include <mrpt/opengl/opengl_api.h>
@@ -123,7 +123,33 @@ void CRenderizableShaderPoints::params_deserialize(
 			in >> m_pointSize >> m_variablePointSize >> m_variablePointSize_K >>
 				m_variablePointSize_DepthScale;
 			break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
+}
+
+const mrpt::math::TBoundingBox CRenderizableShaderPoints::verticesBoundingBox()
+	const
+{
+	mrpt::math::TBoundingBox bb;
+
+	if (m_vertex_buffer_data.empty()) return bb;
+
+	bb.min = mrpt::math::TPoint3D(
+		std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
+		std::numeric_limits<double>::max());
+	bb.max = mrpt::math::TPoint3D(
+		-std::numeric_limits<double>::max(),
+		-std::numeric_limits<double>::max(),
+		-std::numeric_limits<double>::max());
+
+	for (const auto& p : m_vertex_buffer_data)
+	{
+		keep_min(bb.min.x, p.x);
+		keep_max(bb.max.x, p.x);
+		keep_min(bb.min.y, p.y);
+		keep_max(bb.max.y, p.y);
+		keep_min(bb.min.z, p.z);
+		keep_max(bb.max.z, p.z);
+	}
+	return bb;
 }

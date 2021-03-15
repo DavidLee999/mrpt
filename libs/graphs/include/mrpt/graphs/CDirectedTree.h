@@ -2,13 +2,14 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 #pragma once
 
 #include <mrpt/graphs/TNodeID.h>
+
 #include <list>
 #include <sstream>
 
@@ -122,14 +123,14 @@ class CDirectedTree
 	{
 		const size_t next_depth_level = root_depth_level + 1;
 		auto itChildren = edges_to_children.find(vroot);
-		if (itChildren == edges_to_children.end()) return;  // No children
+		if (itChildren == edges_to_children.end()) return;	// No children
 		const TListEdges& children = itChildren->second;
 		for (auto itEdge = children.begin(); itEdge != children.end(); ++itEdge)
 		{
 			user_visitor.OnVisitNode(vroot, *itEdge, next_depth_level);
 			visitDepthFirst(
 				itEdge->id, user_visitor,
-				next_depth_level);  // Recursive depth-first call.
+				next_depth_level);	// Recursive depth-first call.
 		}
 	}
 
@@ -142,14 +143,14 @@ class CDirectedTree
 	{
 		const size_t next_depth_level = root_depth_level + 1;
 		auto itChildren = edges_to_children.find(vroot);
-		if (itChildren == edges_to_children.end()) return;  // No children
+		if (itChildren == edges_to_children.end()) return;	// No children
 		const TListEdges& children = itChildren->second;
 		for (auto itEdge = children.begin(); itEdge != children.end(); ++itEdge)
 			user_visitor.OnVisitNode(vroot, *itEdge, next_depth_level);
 		for (auto itEdge = children.begin(); itEdge != children.end(); ++itEdge)
 			visitDepthFirst(
 				itEdge->id, user_visitor,
-				next_depth_level);  // Recursive breath-first call.
+				next_depth_level);	// Recursive breath-first call.
 	}
 
 	/** Return a text representation of the tree spanned in a depth-first view,

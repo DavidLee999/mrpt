@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/core/round.h>
 #include <mrpt/maps/CHeightGridMap2D_Base.h>
 #include <mrpt/maps/CSimplePointsMap.h>
@@ -171,7 +171,7 @@ bool CHeightGridMap2D_Base::dem_internal_insertObservation(
 	{
 		TPointInsertParams pt_params;
 		pt_params.update_map_after_insertion =
-			false;  // update only once at end
+			false;	// update only once at end
 
 		const size_t N = thePointsMoved.size();
 		for (size_t i = 0; i < N; i++)

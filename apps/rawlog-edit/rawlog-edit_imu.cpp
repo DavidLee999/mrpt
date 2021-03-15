@@ -2,14 +2,14 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "rawlog-edit-declarations.h"
-
 #include <mrpt/obs/CObservationIMU.h>
+
+#include "rawlog-edit-declarations.h"
 
 using namespace mrpt;
 using namespace mrpt::obs;
@@ -62,8 +62,7 @@ DECLARE_OP_FUNCTION(op_export_imu_txt)
 
 			if (it == lstFiles.end())  // A new file for this sensorlabel??
 			{
-				const std::string fileName =
-					m_filPrefix + string("_") +
+				const std::string fileName = m_filPrefix + string("_") +
 					fileNameStripInvalidChars(obs->sensorLabel) +
 					string(".txt");
 
@@ -80,7 +79,7 @@ DECLARE_OP_FUNCTION(op_export_imu_txt)
 				::fprintf(
 					f_this,
 					"%% "
-					"%14s "  // TIMESTAMP
+					"%14s "	 // TIMESTAMP
 					"%22s %22s %22s "  // IMU_{X,Y,Z}_ACC
 					"%22s %22s %22s "  // IMU_YAW_VEL...
 					"%22s %22s %22s "  // IMU_X_VEL...

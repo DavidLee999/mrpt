@@ -2,14 +2,16 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/config/CConfigFile.h>
+#include <mrpt/core/SSE_macros.h>
+#include <mrpt/core/SSE_types.h>
 #include <mrpt/maps/CPointsMap.h>
 #include <mrpt/maps/CSimplePointsMap.h>
 #include <mrpt/math/TPose2D.h>
@@ -25,11 +27,9 @@
 #include <mrpt/system/CTicTac.h>
 #include <mrpt/system/CTimeLogger.h>
 #include <mrpt/system/os.h>
+
 #include <fstream>
 #include <sstream>
-
-#include <mrpt/core/SSE_macros.h>
-#include <mrpt/core/SSE_types.h>
 
 #if MRPT_HAS_MATLAB
 #include <mexplus.h>
@@ -128,8 +128,7 @@ bool CPointsMap::load2Dor3D_from_text_stream(
 						"format on line "
 					 << linIdx << " for coordinate #" << (idxCoord + 1) << "\n";
 
-				if (outErrorMsg)
-					outErrorMsg.value().get() = sErr.str();
+				if (outErrorMsg) outErrorMsg.value().get() = sErr.str();
 				else
 					std::cerr << sErr.str();
 
@@ -285,7 +284,7 @@ void CPointsMap::determineMatching2D(
 {
 	MRPT_START
 
-	extraResults = TMatchingExtraResults();  // Clear output
+	extraResults = TMatchingExtraResults();	 // Clear output
 
 	ASSERT_GT_(params.decimation_other_map_points, 0);
 	ASSERT_LT_(
@@ -301,16 +300,9 @@ void CPointsMap::determineMatching2D(
 	float _sumSqrDist = 0;
 	size_t _sumSqrCount = 0;
 	size_t nOtherMapPointsWithCorrespondence =
-		0;  // Number of points with one corrs. at least
+		0;	// Number of points with one corrs. at least
 
-	float local_x_min = std::numeric_limits<float>::max(),
-		  local_x_max = -std::numeric_limits<float>::max();
-	float global_x_min = std::numeric_limits<float>::max(),
-		  global_x_max = -std::numeric_limits<float>::max();
-	float local_y_min = std::numeric_limits<float>::max(),
-		  local_y_max = -std::numeric_limits<float>::max();
-	float global_y_min = std::numeric_limits<float>::max(),
-		  global_y_max = -std::numeric_limits<float>::max();
+	auto bbLocal = mrpt::math::TBoundingBoxf::PlusMinusInfinity();
 
 	double maxDistForCorrespondenceSquared;
 	float x_local, y_local;
@@ -384,16 +376,16 @@ void CPointsMap::determineMatching2D(
 	alignas(MRPT_MAX_STATIC_ALIGN_BYTES) float temp_nums[4];
 
 	_mm_store_ps(temp_nums, x_mins);
-	local_x_min =
+	bbLocal.min.x =
 		min(min(temp_nums[0], temp_nums[1]), min(temp_nums[2], temp_nums[3]));
 	_mm_store_ps(temp_nums, y_mins);
-	local_y_min =
+	bbLocal.min.y =
 		min(min(temp_nums[0], temp_nums[1]), min(temp_nums[2], temp_nums[3]));
 	_mm_store_ps(temp_nums, x_maxs);
-	local_x_max =
+	bbLocal.max.x =
 		max(max(temp_nums[0], temp_nums[1]), max(temp_nums[2], temp_nums[3]));
 	_mm_store_ps(temp_nums, y_maxs);
-	local_y_max =
+	bbLocal.max.y =
 		max(max(temp_nums[0], temp_nums[1]), max(temp_nums[2], temp_nums[3]));
 
 	// transform extra pts & update BBox
@@ -404,11 +396,11 @@ void CPointsMap::determineMatching2D(
 		float out_x = otherMapPose.x + cos_phi * x - sin_phi * y;
 		float out_y = otherMapPose.y + sin_phi * x + cos_phi * y;
 
-		local_x_min = std::min(local_x_min, out_x);
-		local_x_max = std::max(local_x_max, out_x);
+		bbLocal.min.x = std::min(bbLocal.min.x, out_x);
+		bbLocal.max.x = std::max(bbLocal.max.x, out_x);
 
-		local_y_min = std::min(local_y_min, out_y);
-		local_y_max = std::max(local_y_max, out_y);
+		bbLocal.min.y = std::min(bbLocal.min.y, out_y);
+		bbLocal.max.y = std::max(bbLocal.max.y, out_y);
 
 		ptr_out_x[k] = out_x;
 		ptr_out_y[k] = out_y;
@@ -426,23 +418,20 @@ void CPointsMap::determineMatching2D(
 	Eigen::Array<float, Eigen::Dynamic, 1> y_locals =
 		otherMapPose.y + sin_phi * x_org.array() + cos_phi * y_org.array();
 
-	local_x_min = x_locals.minCoeff();
-	local_y_min = y_locals.minCoeff();
-	local_x_max = x_locals.maxCoeff();
-	local_y_max = y_locals.maxCoeff();
+	bbLocal.min.x = x_locals.minCoeff();
+	bbLocal.min.y = y_locals.minCoeff();
+	bbLocal.max.x = x_locals.maxCoeff();
+	bbLocal.max.y = y_locals.maxCoeff();
 #endif
 
 	// Find the bounding box:
-	float global_z_min, global_z_max;
-	this->boundingBox(
-		global_x_min, global_x_max, global_y_min, global_y_max, global_z_min,
-		global_z_max);
+	const auto bbGlobal = this->boundingBox();
 
 	// Only try doing a matching if there exist any chance of both maps
 	// touching/overlaping:
-	if (local_x_min > global_x_max || local_x_max < global_x_min ||
-		local_y_min > global_y_max || local_y_max < global_y_min)
-		return;  // We know for sure there is no matching at all
+	if (bbLocal.min.x > bbGlobal.max.x || bbLocal.max.x < bbGlobal.min.x ||
+		bbLocal.min.y > bbGlobal.max.y || bbLocal.max.y < bbGlobal.min.y)
+		return;	 // We know for sure there is no matching at all
 
 	// Loop for each point in local map:
 	// --------------------------------------------------
@@ -470,7 +459,7 @@ void CPointsMap::determineMatching2D(
 		float tentativ_err_sq;
 		unsigned int tentativ_this_idx = kdTreeClosestPoint2D(
 			x_local, y_local,  // Look closest to this guy
-			tentativ_err_sq  // save here the min. distance squared
+			tentativ_err_sq	 // save here the min. distance squared
 		);
 
 		// Compute max. allowed distance:
@@ -538,8 +527,7 @@ void CPointsMap::determineMatching2D(
 
 	// The ratio of points in the other map with corrs:
 	extraResults.correspondencesRatio = params.decimation_other_map_points *
-										nOtherMapPointsWithCorrespondence /
-										d2f(nLocalPoints);
+		nOtherMapPointsWithCorrespondence / d2f(nLocalPoints);
 
 	MRPT_END
 }
@@ -555,8 +543,8 @@ void CPointsMap::changeCoordinatesReference(const CPose2D& newBase)
 
 	for (size_t i = 0; i < N; i++)
 		newBase3D.composePoint(
-			m_x[i], m_y[i], m_z[i],  // In
-			m_x[i], m_y[i], m_z[i]  // Out
+			m_x[i], m_y[i], m_z[i],	 // In
+			m_x[i], m_y[i], m_z[i]	// Out
 		);
 
 	mark_as_modified();
@@ -571,8 +559,8 @@ void CPointsMap::changeCoordinatesReference(const CPose3D& newBase)
 
 	for (size_t i = 0; i < N; i++)
 		newBase.composePoint(
-			m_x[i], m_y[i], m_z[i],  // In
-			m_x[i], m_y[i], m_z[i]  // Out
+			m_x[i], m_y[i], m_z[i],	 // In
+			m_x[i], m_y[i], m_z[i]	// Out
 		);
 
 	mark_as_modified();
@@ -611,7 +599,7 @@ void CPointsMap::TInsertionOptions::writeToStream(
 	out << minDistBetweenLaserPoints << addToExistingPointsMap
 		<< also_interpolate << disableDeletion << fuseWithExisting
 		<< isPlanarMap << horizontalTolerance << maxDistForInterpolatePoints
-		<< insertInvalidPoints;  // v0
+		<< insertInvalidPoints;	 // v0
 }
 
 void CPointsMap::TInsertionOptions::readFromStream(
@@ -626,11 +614,10 @@ void CPointsMap::TInsertionOptions::readFromStream(
 			in >> minDistBetweenLaserPoints >> addToExistingPointsMap >>
 				also_interpolate >> disableDeletion >> fuseWithExisting >>
 				isPlanarMap >> horizontalTolerance >>
-				maxDistForInterpolatePoints >> insertInvalidPoints;  // v0
+				maxDistForInterpolatePoints >> insertInvalidPoints;	 // v0
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
 
@@ -658,8 +645,7 @@ void CPointsMap::TLikelihoodOptions::readFromStream(
 			in >> sigma_dist >> max_corr_distance >> decimation;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
 
@@ -684,8 +670,7 @@ void CPointsMap::TRenderOptions::readFromStream(
 			in.ReadAsAndCastTo<int8_t>(this->colormap);
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
 
@@ -788,10 +773,11 @@ void CPointsMap::getAs3DObject(mrpt::opengl::CSetOfObjects::Ptr& outObj) const
 		auto obj = opengl::CPointCloudColoured::Create();
 		obj->loadFromPointsMap(this);
 		obj->setPointSize(renderOptions.point_size);
-		mrpt::math::TPoint3D pMin, pMax;
-		this->boundingBox(pMin, pMax);
+
+		const auto bb = this->boundingBox();
+
 		obj->recolorizeByCoordinate(
-			pMin.z, pMax.z, 2 /*z*/, renderOptions.colormap);
+			bb.min.z, bb.max.z, 2 /*z*/, renderOptions.colormap);
 		outObj->insert(obj);
 	}
 	MRPT_END
@@ -884,9 +870,9 @@ float CPointsMap::squareDistanceToClosestCorrespondence(
 	// The distance to the line that interpolates the TWO closest points:
 	float x1, y1, x2, y2, d1, d2;
 	kdTreeTwoClosestPoint2D(
-		x0, y0,  // The query
-		x1, y1,  // Closest point #1
-		x2, y2,  // Closest point #2
+		x0, y0,	 // The query
+		x1, y1,	 // Closest point #1
+		x2, y2,	 // Closest point #2
 		d1, d2);
 
 	ASSERT_(d2 >= d1);
@@ -894,18 +880,16 @@ float CPointsMap::squareDistanceToClosestCorrespondence(
 	// If the two points are too far, do not interpolate:
 	float d12 = square(x1 - x2) + square(y1 - y2);
 	if (d12 > 0.20f * 0.20f || d12 < 0.03f * 0.03f)
-	{
-		return square(x1 - x0) + square(y1 - y0);
-	}
+	{ return square(x1 - x0) + square(y1 - y0); }
 	else
 	{  // Interpolate
 		double interp_x, interp_y;
 
 		// math::closestFromPointToSegment(
 		math::closestFromPointToLine(
-			x0, y0,  // the point
-			x1, y1, x2, y2,  // The segment
-			interp_x, interp_y  // out
+			x0, y0,	 // the point
+			x1, y1, x2, y2,	 // The segment
+			interp_x, interp_y	// out
 		);
 
 		return square(interp_x - x0) + square(interp_y - y0);
@@ -913,12 +897,7 @@ float CPointsMap::squareDistanceToClosestCorrespondence(
 #endif
 }
 
-/*---------------------------------------------------------------
-				boundingBox
----------------------------------------------------------------*/
-void CPointsMap::boundingBox(
-	float& min_x, float& max_x, float& min_y, float& max_y, float& min_z,
-	float& max_z) const
+mrpt::math::TBoundingBoxf CPointsMap::boundingBox() const
 {
 	MRPT_START
 
@@ -928,8 +907,8 @@ void CPointsMap::boundingBox(
 	{
 		if (!nPoints)
 		{
-			m_bb_min_x = m_bb_max_x = m_bb_min_y = m_bb_max_y = m_bb_min_z =
-				m_bb_max_z = 0;
+			m_boundingBox.min = {0, 0, 0};
+			m_boundingBox.max = {0, 0, 0};
 		}
 		else
 		{
@@ -969,71 +948,58 @@ void CPointsMap::boundingBox(
 			alignas(MRPT_MAX_STATIC_ALIGN_BYTES) float temp_nums[4];
 
 			_mm_store_ps(temp_nums, x_mins);
-			m_bb_min_x =
+			m_boundingBox.min.x =
 				min(min(temp_nums[0], temp_nums[1]),
 					min(temp_nums[2], temp_nums[3]));
 			_mm_store_ps(temp_nums, y_mins);
-			m_bb_min_y =
+			m_boundingBox.min.y =
 				min(min(temp_nums[0], temp_nums[1]),
 					min(temp_nums[2], temp_nums[3]));
 			_mm_store_ps(temp_nums, z_mins);
-			m_bb_min_z =
+			m_boundingBox.min.z =
 				min(min(temp_nums[0], temp_nums[1]),
 					min(temp_nums[2], temp_nums[3]));
 			_mm_store_ps(temp_nums, x_maxs);
-			m_bb_max_x =
+			m_boundingBox.max.x =
 				max(max(temp_nums[0], temp_nums[1]),
 					max(temp_nums[2], temp_nums[3]));
 			_mm_store_ps(temp_nums, y_maxs);
-			m_bb_max_y =
+			m_boundingBox.max.y =
 				max(max(temp_nums[0], temp_nums[1]),
 					max(temp_nums[2], temp_nums[3]));
 			_mm_store_ps(temp_nums, z_maxs);
-			m_bb_max_z =
+			m_boundingBox.max.z =
 				max(max(temp_nums[0], temp_nums[1]),
 					max(temp_nums[2], temp_nums[3]));
 
 			// extra
 			for (size_t k = 0; k < nPoints % 4; k++)
-			{
-				m_bb_min_x = std::min(m_bb_min_x, ptr_in_x[k]);
-				m_bb_max_x = std::max(m_bb_max_x, ptr_in_x[k]);
-
-				m_bb_min_y = std::min(m_bb_min_y, ptr_in_y[k]);
-				m_bb_max_y = std::max(m_bb_max_y, ptr_in_y[k]);
-
-				m_bb_min_z = std::min(m_bb_min_z, ptr_in_z[k]);
-				m_bb_max_z = std::max(m_bb_max_z, ptr_in_z[k]);
-			}
+				m_boundingBox.updateWithPoint(
+					{ptr_in_x[k], ptr_in_y[k], ptr_in_z[k]});
 #else
 			// Non vectorized version:
-			m_bb_min_x = m_bb_min_y = m_bb_min_z =
+			m_boundingBox.min.x = m_boundingBox.min.y = m_boundingBox.min.z =
 				(std::numeric_limits<float>::max)();
 
-			m_bb_max_x = m_bb_max_y = m_bb_max_z =
+			m_boundingBox.max.x = m_boundingBox.max.y = m_boundingBox.max.z =
 				-(std::numeric_limits<float>::max)();
 
 			for (auto xi = m_x.begin(), yi = m_y.begin(), zi = m_z.begin();
 				 xi != m_x.end(); xi++, yi++, zi++)
 			{
-				m_bb_min_x = min(m_bb_min_x, *xi);
-				m_bb_max_x = max(m_bb_max_x, *xi);
-				m_bb_min_y = min(m_bb_min_y, *yi);
-				m_bb_max_y = max(m_bb_max_y, *yi);
-				m_bb_min_z = min(m_bb_min_z, *zi);
-				m_bb_max_z = max(m_bb_max_z, *zi);
+				m_boundingBox.min.x = min(m_boundingBox.min.x, *xi);
+				m_boundingBox.max.x = max(m_boundingBox.max.x, *xi);
+				m_boundingBox.min.y = min(m_boundingBox.min.y, *yi);
+				m_boundingBox.max.y = max(m_boundingBox.max.y, *yi);
+				m_boundingBox.min.z = min(m_boundingBox.min.z, *zi);
+				m_boundingBox.max.z = max(m_boundingBox.max.z, *zi);
 			}
 #endif
 		}
 		m_boundingBoxIsUpdated = true;
 	}
 
-	min_x = m_bb_min_x;
-	max_x = m_bb_max_x;
-	min_y = m_bb_min_y;
-	max_y = m_bb_max_y;
-	min_z = m_bb_min_z;
-	max_z = m_bb_max_z;
+	return m_boundingBox;
 	MRPT_END
 }
 
@@ -1061,14 +1027,9 @@ void CPointsMap::determineMatching3D(
 	float _sumSqrDist = 0;
 	size_t _sumSqrCount = 0;
 	size_t nOtherMapPointsWithCorrespondence =
-		0;  // Number of points with one corrs. at least
+		0;	// Number of points with one corrs. at least
 
-	float local_x_min = std::numeric_limits<float>::max(),
-		  local_x_max = -std::numeric_limits<float>::max();
-	float local_y_min = std::numeric_limits<float>::max(),
-		  local_y_max = -std::numeric_limits<float>::max();
-	float local_z_min = std::numeric_limits<float>::max(),
-		  local_z_max = -std::numeric_limits<float>::max();
+	auto bbLocal = mrpt::math::TBoundingBoxf::PlusMinusInfinity();
 
 	double maxDistForCorrespondenceSquared;
 
@@ -1101,26 +1062,16 @@ void CPointsMap::determineMatching3D(
 		z_locals[localIdx] = z_local;
 
 		// Find the bounding box:
-		local_x_min = min(local_x_min, x_local);
-		local_x_max = max(local_x_max, x_local);
-		local_y_min = min(local_y_min, y_local);
-		local_y_max = max(local_y_max, y_local);
-		local_z_min = min(local_z_min, z_local);
-		local_z_max = max(local_z_max, z_local);
+		bbLocal.updateWithPoint({x_local, y_local, z_local});
 	}
 
 	// Find the bounding box:
-	float global_x_min, global_x_max, global_y_min, global_y_max, global_z_min,
-		global_z_max;
-	this->boundingBox(
-		global_x_min, global_x_max, global_y_min, global_y_max, global_z_min,
-		global_z_max);
+	const auto bbGlobal = this->boundingBox();
 
 	// Solo hacer matching si existe alguna posibilidad de que
 	//  los dos mapas se toquen:
-	if (local_x_min > global_x_max || local_x_max < global_x_min ||
-		local_y_min > global_y_max || local_y_max < global_y_min)
-		return;  // No need to compute: matching is ZERO.
+	if (!bbLocal.intersection(bbGlobal).has_value())
+		return;	 // No need to compute: matching is ZERO.
 
 	// Loop for each point in local map:
 	// --------------------------------------------------
@@ -1141,8 +1092,8 @@ void CPointsMap::determineMatching3D(
 
 			float tentativ_err_sq;
 			const unsigned int tentativ_this_idx = kdTreeClosestPoint3D(
-				x_local, y_local, z_local,  // Look closest to this guy
-				tentativ_err_sq  // save here the min. distance squared
+				x_local, y_local, z_local,	// Look closest to this guy
+				tentativ_err_sq	 // save here the min. distance squared
 			);
 
 			// Compute max. allowed distance:
@@ -1205,8 +1156,7 @@ void CPointsMap::determineMatching3D(
 	extraResults.sumSqrDist =
 		(_sumSqrCount) ? _sumSqrDist / static_cast<double>(_sumSqrCount) : 0;
 	extraResults.correspondencesRatio = params.decimation_other_map_points *
-										nOtherMapPointsWithCorrespondence /
-										d2f(nLocalPoints);
+		nOtherMapPointsWithCorrespondence / d2f(nLocalPoints);
 
 	MRPT_END
 }
@@ -1268,7 +1218,7 @@ void CPointsMap::compute3DDistanceToMesh(
 	const size_t nLocalPoints = otherMap->size();
 	const size_t nGlobalPoints = this->size();
 	size_t nOtherMapPointsWithCorrespondence =
-		0;  // Number of points with one corrs. at least
+		0;	// Number of points with one corrs. at least
 
 	// Prepare output: no correspondences initially:
 	correspondences.clear();
@@ -1280,31 +1230,20 @@ void CPointsMap::compute3DDistanceToMesh(
 	tempCorrs.reserve(nLocalPoints);
 
 	// Hay mapa global?
-	if (!nGlobalPoints) return;  // No
+	if (!nGlobalPoints) return;	 // No
 
 	// Hay mapa local?
-	if (!nLocalPoints) return;  // No
+	if (!nLocalPoints) return;	// No
 
 	// we'll assume by now both reference systems are the same
-	float local_x_min, local_x_max, local_y_min, local_y_max, local_z_min,
-		local_z_max;
-	otherMap->boundingBox(
-		local_x_min, local_x_max, local_y_min, local_y_max, local_z_min,
-		local_z_max);
+	const auto bbLocal = otherMap->boundingBox();
 
 	// Find the bounding box:
-	float global_x_min, global_x_max, global_y_min, global_y_max, global_z_min,
-		global_z_max;
-	this->boundingBox(
-		global_x_min, global_x_max, global_y_min, global_y_max, global_z_min,
-		global_z_max);
+	const auto bbGlobal = this->boundingBox();
 
 	// Solo hacer matching si existe alguna posibilidad de que
 	//  los dos mapas se toquen:
-	if (local_x_min > global_x_max || local_x_max < global_x_min ||
-		local_y_min > global_y_max || local_y_max < global_y_min)
-		return;  // No hace falta hacer matching,
-	//   porque es de CERO.
+	if (!bbLocal.intersection(bbGlobal).has_value()) return;
 
 	std::vector<std::vector<size_t>> vIdx;
 
@@ -1325,11 +1264,11 @@ void CPointsMap::compute3DDistanceToMesh(
 			//   (x_local, y_local, z_local)
 			// In "this" (global/reference) points map.
 			kdTreeNClosestPoint3DWithIdx(
-				x_local, y_local, z_local,  // Look closest to this guy
-				3,  // get the three closest points
+				x_local, y_local, z_local,	// Look closest to this guy
+				3,	// get the three closest points
 				outX, outY, outZ,  // output vectors
-				outIdx,  // output indexes
-				tentativeErrSq  // save here the min. distance squared
+				outIdx,	 // output indexes
+				tentativeErrSq	// save here the min. distance squared
 			);
 
 			// get the centroid
@@ -1386,7 +1325,7 @@ void CPointsMap::compute3DDistanceToMesh(
 			best[i0].find(i1) != best[i0].end() &&
 			best[i0][i1].find(i2) !=
 				best[i0][i1]
-					.end())  // if there is a match, check if it is better
+					.end())	 // if there is a match, check if it is better
 		{
 			if (best[i0][i1][i2].second > it->errorSquareAfterTransformation)
 			{
@@ -1420,7 +1359,7 @@ void CPointsMap::compute3DDistanceToMesh(
 
 double CPointsMap::internal_computeObservationLikelihoodPointCloud3D(
 	const mrpt::poses::CPose3D& pc_in_map, const float* xs, const float* ys,
-	const float* zs, const std::size_t num_pts)
+	const float* zs, const std::size_t num_pts) const
 {
 	MRPT_TRY_START
 
@@ -1439,10 +1378,10 @@ double CPointsMap::internal_computeObservationLikelihoodPointCloud3D(
 		pc_in_map.composePoint(xs[i], ys[i], zs[i], xg, yg, zg);
 
 		kdTreeClosestPoint3D(
-			xg, yg, zg,  // Look for the closest to this guy
+			xg, yg, zg,	 // Look for the closest to this guy
 			closest_x, closest_y,
-			closest_z,  // save here the closest match
-			closest_err  // save here the min. distance squared
+			closest_z,	// save here the closest match
+			closest_err	 // save here the min. distance squared
 		);
 
 		// Put a limit:
@@ -1459,7 +1398,7 @@ double CPointsMap::internal_computeObservationLikelihoodPointCloud3D(
 }
 
 double CPointsMap::internal_computeObservationLikelihood(
-	const CObservation& obs, const CPose3D& takenFrom)
+	const CObservation& obs, const CPose3D& takenFrom) const
 {
 	// This function depends on the observation type:
 	// -----------------------------------------------------
@@ -1504,9 +1443,9 @@ double CPointsMap::internal_computeObservationLikelihood(
 				const float yg = takenFrom2D.y + csin * xs[i] + ccos * ys[i];
 
 				kdTreeClosestPoint2D(
-					xg, yg,  // Look for the closest to this guy
+					xg, yg,	 // Look for the closest to this guy
 					closest_x, closest_y,  // save here the closest match
-					closest_err  // save here the min. distance squared
+					closest_err	 // save here the min. distance squared
 				);
 
 				// Put a limit:
@@ -1797,13 +1736,13 @@ bool CPointsMap::internal_insertObservation(
 				auxMap.insertionOptions.addToExistingPointsMap = false;
 
 				auxMap.loadFromRangeScan(
-					o,  // The laser range scan observation
+					o,	// The laser range scan observation
 					&robotPose3D  // The robot pose
 				);
 
 				fuseWith(
 					&auxMap,  // Fuse with this map
-					insertionOptions.minDistBetweenLaserPoints,  // Min dist.
+					insertionOptions.minDistBetweenLaserPoints,	 // Min dist.
 					&checkForDeletion  // Set to "false" if a point in "map"
 									   // has
 					// been fused.
@@ -1834,7 +1773,7 @@ bool CPointsMap::internal_insertObservation(
 							getPoint(i, x, y);
 							if (!pol.PointIntoPolygon(x, y))
 								checkForDeletion[i] =
-									false;  // Out of polygon, don't delete
+									false;	// Out of polygon, don't delete
 						}
 					}
 
@@ -1849,7 +1788,7 @@ bool CPointsMap::internal_insertObservation(
 				// Don't fuse: Simply add
 				insertionOptions.addToExistingPointsMap = true;
 				loadFromRangeScan(
-					o,  // The laser range scan observation
+					o,	// The laser range scan observation
 					&robotPose3D  // The robot pose
 				);
 			}
@@ -1873,7 +1812,7 @@ bool CPointsMap::internal_insertObservation(
 
 		if (insertionOptions.isPlanarMap)
 			reallyInsertIt =
-				false;  // Don't insert 3D range observation into planar map
+				false;	// Don't insert 3D range observation into planar map
 		else
 			reallyInsertIt = true;
 
@@ -1889,14 +1828,14 @@ bool CPointsMap::internal_insertObservation(
 				auxMap.insertionOptions.addToExistingPointsMap = false;
 
 				auxMap.loadFromRangeScan(
-					o,  // The laser range scan observation
+					o,	// The laser range scan observation
 					&robotPose3D  // The robot pose
 				);
 
 				fuseWith(
 					&auxMap,  // Fuse with this map
-					insertionOptions.minDistBetweenLaserPoints,  // Min dist.
-					nullptr  // rather than &checkForDeletion which we don't
+					insertionOptions.minDistBetweenLaserPoints,	 // Min dist.
+					nullptr	 // rather than &checkForDeletion which we don't
 					// need
 					// for 3D observations
 				);
@@ -1906,7 +1845,7 @@ bool CPointsMap::internal_insertObservation(
 				// Don't fuse: Simply add
 				insertionOptions.addToExistingPointsMap = true;
 				loadFromRangeScan(
-					o,  // The laser range scan observation
+					o,	// The laser range scan observation
 					&robotPose3D  // The robot pose
 				);
 			}
@@ -2084,8 +2023,8 @@ void CPointsMap::fuseWith(
 			if (corrsIt->other_idx == i)
 			{
 				float dist = square(corrsIt->other_x - corrsIt->this_x) +
-							 square(corrsIt->other_y - corrsIt->this_y) +
-							 square(corrsIt->other_z - corrsIt->this_z);
+					square(corrsIt->other_y - corrsIt->this_y) +
+					square(corrsIt->other_z - corrsIt->this_z);
 				if (dist < minDist)
 				{
 					minDist = dist;
@@ -2134,7 +2073,7 @@ void CPointsMap::loadFromVelodyneScan(
 
 	// Insert vs. load and replace:
 	if (!insertionOptions.addToExistingPointsMap)
-		resize(0);  // Resize to 0 instead of clear() so the std::vector<>
+		resize(0);	// Resize to 0 instead of clear() so the std::vector<>
 	// memory is not actually deallocated and can be reused.
 
 	// Alloc space:
@@ -2143,12 +2082,11 @@ void CPointsMap::loadFromVelodyneScan(
 	const size_t nNewPtsCount = nOldPtsCount + nScanPts;
 	this->resize(nNewPtsCount);
 
-	const float K = 1.0f / 255;  // Intensity scale.
+	const float K = 1.0f / 255;	 // Intensity scale.
 
 	// global 3D pose:
 	CPose3D sensorGlobalPose;
-	if (robotPose)
-		sensorGlobalPose = *robotPose + scan.sensorPose;
+	if (robotPose) sensorGlobalPose = *robotPose + scan.sensorPose;
 	else
 		sensorGlobalPose = scan.sensorPose;
 
@@ -2173,7 +2111,7 @@ void CPointsMap::loadFromVelodyneScan(
 
 		this->setPointRGB(
 			nOldPtsCount + i, gx, gy, gz,  // XYZ
-			inten, inten, inten  // RGB
+			inten, inten, inten	 // RGB
 		);
 	}
 }

@@ -2,19 +2,21 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 #pragma once
 
 #include <mrpt/math/TPoseOrPoint.h>
+
 #include <vector>
 
 namespace mrpt::math
 {
 /** 2D twist: 2D velocity vector (vx,vy) + planar angular velocity (omega)
  * \sa mrpt::math::TTwist3D, mrpt::math::TPose2D
+ * \ingroup geometry_grp
  */
 struct TTwist2D : public internal::ProvideStaticResize<TTwist2D>
 {
@@ -39,14 +41,10 @@ struct TTwist2D : public internal::ProvideStaticResize<TTwist2D>
 	{
 		switch (i)
 		{
-			case 0:
-				return vx;
-			case 1:
-				return vy;
-			case 2:
-				return omega;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return vx;
+			case 1: return vy;
+			case 2: return omega;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/** Coordinate access using operator[]. Order: vx,vy,vphi */
@@ -54,14 +52,10 @@ struct TTwist2D : public internal::ProvideStaticResize<TTwist2D>
 	{
 		switch (i)
 		{
-			case 0:
-				return vx;
-			case 1:
-				return vy;
-			case 2:
-				return omega;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return vx;
+			case 1: return vy;
+			case 2: return omega;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/** Transformation into vector */

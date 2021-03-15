@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -45,7 +45,7 @@ TEST(CTimeLogger, getLastTime)
 	doTimLogEntry(tl, "foo", 10);
 	EXPECT_EQ(tl.getLastTime("foo"), 0);
 
-	tl.clear(true);  // to silent console output upon dtor
+	tl.clear(true);	 // to silent console output upon dtor
 }
 
 TEST(CTimeLogger, getMeanTime)
@@ -56,7 +56,7 @@ TEST(CTimeLogger, getMeanTime)
 
 	EXPECT_GT(tl.getMeanTime("foo"), 100e-3);
 
-	tl.clear(true);  // to silent console output upon dtor
+	tl.clear(true);	 // to silent console output upon dtor
 }
 
 TEST(CTimeLogger, printStats)

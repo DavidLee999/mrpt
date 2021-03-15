@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -84,8 +84,7 @@ class CPolyhedron : public CRenderizableShaderWireFrame,
 		 */
 		bool operator==(const TPolyhedronEdge& e) const
 		{
-			if (e.v1 == v1 && e.v2 == v2)
-				return true;
+			if (e.v1 == v1 && e.v2 == v2) return true;
 			else
 				return e.v1 == v2 && e.v2 == v1;
 		}
@@ -150,9 +149,7 @@ class CPolyhedron : public CRenderizableShaderWireFrame,
    public:
 	/** Evaluates the bounding box of this object (including possible children)
 	 * in the coordinate frame of the object parent. */
-	void getBoundingBox(
-		mrpt::math::TPoint3D& bb_min,
-		mrpt::math::TPoint3D& bb_max) const override;
+	mrpt::math::TBoundingBox getBoundingBox() const override;
 
 	// Static methods to create frequent polyhedra. More bizarre polyhedra are
 	// intended to be added in a near future.

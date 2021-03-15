@@ -2,12 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include <mrpt/obs/CObservation3DRangeScan.h>
+
 #include "rawlog-edit-declarations.h"
 
 using namespace mrpt;
@@ -48,7 +49,7 @@ DECLARE_OP_FUNCTION(op_generate_3d_pointclouds)
 					std::dynamic_pointer_cast<CObservation3DRangeScan>(obs);
 				if (obs3D->hasRangeImage)
 				{
-					obs3D->load();  // We must be sure that depth has been
+					obs3D->load();	// We must be sure that depth has been
 					// loaded, if stored separately.
 					obs3D->unprojectInto(*obs3D);
 					entries_modified++;
@@ -66,8 +67,7 @@ DECLARE_OP_FUNCTION(op_generate_3d_pointclouds)
 			mrpt::obs::CObservation::Ptr& obs) override
 		{
 			ASSERT_((actions && SF) || obs);
-			if (actions)
-				(*outrawlog.out_rawlog) << actions << SF;
+			if (actions) (*outrawlog.out_rawlog) << actions << SF;
 			else
 				(*outrawlog.out_rawlog) << obs;
 		}

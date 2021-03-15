@@ -2,21 +2,22 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "serialization-precomp.h"  // Precompiled headers
-
+#include "serialization-precomp.h"	// Precompiled headers
+//
 #include <mrpt/core/byte_manip.h>
 #include <mrpt/core/exceptions.h>
 #include <mrpt/serialization/CArchive.h>
 #include <mrpt/serialization/CMessage.h>
 #include <mrpt/serialization/CSerializable.h>
 #include <mrpt/serialization/aligned_serialization.h>
+
 #include <array>
-#include <cstring>  // strlen()
+#include <cstring>	// strlen()
 
 using namespace mrpt::serialization;
 
@@ -104,10 +105,7 @@ void CArchive::WriteObject(const CSerializable* o)
 
 	// First, the "classname".
 	const char* className;
-	if (o != nullptr)
-	{
-		className = o->GetRuntimeClass()->className;
-	}
+	if (o != nullptr) { className = o->GetRuntimeClass()->className; }
 	else
 	{
 		className = "nullptr";
@@ -405,11 +403,11 @@ void CArchive::internal_ReadObjectHeader(
 			 << " version: " << version << endl;
 #endif
 	}
-	catch (std::bad_alloc&)
+	catch (const std::bad_alloc&)
 	{
 		throw;
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
 		if (lengthReadClassName == 255)
 		{
@@ -418,9 +416,10 @@ void CArchive::internal_ReadObjectHeader(
 		}
 		else
 		{
-			THROW_STACKED_EXCEPTION_CUSTOM_MSG2(
-				"Exception while parsing typed object '%s' from stream!\n",
-				readClassName);
+			THROW_EXCEPTION_FMT(
+				"Exception while parsing typed object '%s' from "
+				"stream!\nOriginal exception:\n%s",
+				readClassName, e.what());
 		}
 	}
 }  // end method
@@ -449,19 +448,20 @@ void CArchive::internal_ReadObject(
 					strClassName.c_str());
 		}
 	}
-	catch (std::bad_alloc&)
+	catch (const std::bad_alloc&)
 	{
 		throw;
 	}
-	catch (CExceptionEOF&)
+	catch (const CExceptionEOF&)
 	{
 		throw;
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
-		THROW_STACKED_EXCEPTION_CUSTOM_MSG2(
-			"Exception while parsing typed object '%s' from stream!\n",
-			strClassName.c_str());
+		THROW_EXCEPTION_FMT(
+			"Exception while parsing typed object '%s' from "
+			"stream!\nOriginal exception:\n%s",
+			strClassName.c_str(), e.what());
 	}
 }
 
@@ -504,7 +504,8 @@ CArchive& mrpt::serialization::operator<<(
 {
 	auto N = static_cast<uint32_t>(vec.size());
 	s << N;
-	for (size_t i = 0; i < N; i++) s << vec[i];
+	for (size_t i = 0; i < N; i++)
+		s << vec[i];
 	return s;
 }
 
@@ -514,7 +515,8 @@ CArchive& mrpt::serialization::operator>>(
 	uint32_t N;
 	s >> N;
 	vec.resize(N);
-	for (size_t i = 0; i < N; i++) s >> vec[i];
+	for (size_t i = 0; i < N; i++)
+		s >> vec[i];
 	return s;
 }
 
@@ -532,13 +534,11 @@ void CArchive::sendMessage(const CMessage& msg)
 	buf[nBytesTx++] = (unsigned char)(msg.type);
 
 	if (msg_format_is_tiny)
-	{
-		buf[nBytesTx++] = (unsigned char)msg.content.size();
-	}
+	{ buf[nBytesTx++] = (unsigned char)msg.content.size(); }
 	else
 	{
 		buf[nBytesTx++] = msg.content.size() & 0xff;  // lo
-		buf[nBytesTx++] = (msg.content.size() >> 8) & 0xff;  // hi
+		buf[nBytesTx++] = (msg.content.size() >> 8) & 0xff;	 // hi
 	}
 
 	if (!msg.content.empty())
@@ -547,7 +547,7 @@ void CArchive::sendMessage(const CMessage& msg)
 	buf[nBytesTx++] = 0x96;
 
 	// Send buffer -------------------------------------
-	WriteBuffer(&buf[0], nBytesTx);  // Exceptions will be raised on errors here
+	WriteBuffer(&buf[0], nBytesTx);	 // Exceptions will be raised on errors here
 
 	MRPT_END
 }
@@ -564,8 +564,7 @@ bool CArchive::receiveMessage(CMessage& msg)
 
 	for (;;)
 	{
-		if (nBytesInFrame < 4)
-			nBytesToRx = 1;
+		if (nBytesInFrame < 4) nBytesToRx = 1;
 		else
 		{
 			if (buf[0] == 0x69)
@@ -576,7 +575,7 @@ bool CArchive::receiveMessage(CMessage& msg)
 			else if (buf[0] == 0x79)
 			{
 				payload_len = MAKEWORD16B(
-					buf[3] /*low*/, buf[2] /*hi*/);  // Length of the content
+					buf[3] /*low*/, buf[2] /*hi*/);	 // Length of the content
 				expectedLen = payload_len + 5;
 			}
 			nBytesToRx = expectedLen - nBytesInFrame;

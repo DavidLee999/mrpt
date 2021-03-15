@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -1046,5 +1046,5 @@ class CImage : public mrpt::serialization::CSerializable, public CCanvas
 	void makeSureImageIsLoaded() const;
 	uint8_t* internal_get(int col, int row, uint8_t channel = 0) const;
 	void internal_fromIPL(const IplImage* iplImage, copy_type_t c);
-};  // End of class
+};	// End of class
 }  // namespace mrpt::img

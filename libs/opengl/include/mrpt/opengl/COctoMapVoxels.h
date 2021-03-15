@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -159,8 +159,9 @@ class COctoMapVoxels : public CRenderizableShaderTriangles,
 	virtual shader_list_t requiredShaders() const override
 	{
 		// May use up to two shaders (triangles and lines):
-		return {DefaultShaderID::WIREFRAME, DefaultShaderID::POINTS,
-				DefaultShaderID::TRIANGLES};
+		return {
+			DefaultShaderID::WIREFRAME, DefaultShaderID::POINTS,
+			DefaultShaderID::TRIANGLES};
 	}
 	void onUpdateBuffers_Points() override;
 	void onUpdateBuffers_Wireframe() override;
@@ -353,9 +354,7 @@ class COctoMapVoxels : public CRenderizableShaderTriangles,
 
 	void sort_voxels_by_z();
 
-	void getBoundingBox(
-		mrpt::math::TPoint3D& bb_min,
-		mrpt::math::TPoint3D& bb_max) const override;
+	mrpt::math::TBoundingBox getBoundingBox() const override;
 
 	/** Sets the contents of the object from a mrpt::maps::COctoMap object.
 	 * \tparam Typically, an mrpt::maps::COctoMap object

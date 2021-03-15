@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -17,6 +17,7 @@
 #include <mrpt/math/CMatrixD.h>
 #include <mrpt/serialization/CSerializable.h>
 #include <mrpt/typemeta/TEnumType.h>
+
 #include <list>
 
 namespace mrpt::maps
@@ -87,7 +88,7 @@ struct TRandomFieldCell
 	/** [Dynamic maps only] The std cell value that was updated (to be used in
 	 * the Forgetting_curve */
 	double updated_std;
-};  // namespace mrpt::maps
+};	// namespace mrpt::maps
 
 #if defined(MRPT_IS_X86_AMD64)
 #pragma pack(pop)

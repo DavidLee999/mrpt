@@ -2,14 +2,14 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "obs-precomp.h"  // Precompiled headers
-
-#include <mrpt/math/ops_vectors.h>  // << of std::vector()
+//
+#include <mrpt/math/ops_vectors.h>	// << of std::vector()
 #include <mrpt/obs/CObservationImage.h>
 #include <mrpt/serialization/CArchive.h>
 
@@ -47,10 +47,7 @@ void CObservationImage::serializeFrom(
 		{
 			in >> cameraPose;
 
-			if (version >= 4)
-			{
-				in >> cameraParams;
-			}
+			if (version >= 4) { in >> cameraParams; }
 			else
 			{
 				CMatrixF intrinsicParams, distortionParams;
@@ -81,14 +78,12 @@ void CObservationImage::serializeFrom(
 			else
 				cameraParams.focalLengthMeters = 0.002;
 
-			if (version >= 3)
-				in >> sensorLabel;
+			if (version >= 3) in >> sensorLabel;
 			else
 				sensorLabel = "";
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 }
 
@@ -103,7 +98,7 @@ IMPLEMENTS_MEXPLUS_FROM(mrpt::obs::CObservationImage)
 mxArray* CObservationImage::writeToMatlab() const
 {
 #if MRPT_HAS_MATLAB
-	const char* fields[] = {"class", "ts",   "sensorLabel",
+	const char* fields[] = {"class", "ts",	 "sensorLabel",
 							"image", "pose", "params"};
 	mexplus::MxArray obs_struct(
 		mexplus::MxArray::Struct(sizeof(fields) / sizeof(fields[0]), fields));
@@ -132,8 +127,8 @@ void CObservationImage::getDescriptionAsText(std::ostream& o) const
 
 	o << "Homogeneous matrix for the sensor's 3D pose, relative to robot "
 		 "base:\n";
-	o << cameraPose.getHomogeneousMatrixVal<CMatrixDouble44>() << cameraPose
-	  << "\n";
+	o << cameraPose.getHomogeneousMatrixVal<CMatrixDouble44>() << "\n"
+	  << cameraPose << "\n";
 
 	o << format(
 		"Focal length: %.03f mm\n", cameraParams.focalLengthMeters * 1000);

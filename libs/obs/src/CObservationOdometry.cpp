@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "obs-precomp.h"  // Precompiled headers
-
+//
 #include <mrpt/obs/CObservationOdometry.h>
 #include <mrpt/serialization/CArchive.h>
 #include <mrpt/system/os.h>
@@ -80,8 +80,7 @@ void CObservationOdometry::serializeFrom(
 			}
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 }
 
@@ -102,9 +101,7 @@ void CObservationOdometry::getDescriptionAsText(std::ostream& o) const
 		o << "Encoder info: Not available!\n";
 
 	if (hasVelocities)
-	{
-		o << format("Velocity info: %s\n", velocityLocal.asString().c_str());
-	}
+	{ o << format("Velocity info: %s\n", velocityLocal.asString().c_str()); }
 	else
 		o << "Velocity info: Not available!\n";
 }

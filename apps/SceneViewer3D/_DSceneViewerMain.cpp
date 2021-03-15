@@ -2,13 +2,15 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "_DSceneViewerMain.h"
+
 #include <wx/app.h>
+
 #include "CDlgCamTracking.h"
 #include "CDlgPLYOptions.h"
 
@@ -22,8 +24,6 @@
 #include <wx/tglbtn.h>
 //*)
 
-#include "CDialogOptions.h"
-
 #include <wx/busyinfo.h>
 #include <wx/choicdlg.h>
 #include <wx/colordlg.h>
@@ -36,6 +36,8 @@
 #include <wx/numdlg.h>
 #include <wx/progdlg.h>
 #include <wx/textdlg.h>
+
+#include "CDialogOptions.h"
 
 #if defined(__WXMSW__)
 const std::string iniFileSect("CONF_WIN");
@@ -55,6 +57,8 @@ const std::string iniFileSect("CONF_LIN");
 #include <mrpt/gui/about_box.h>
 #include <mrpt/io/CFileGZInputStream.h>
 #include <mrpt/io/CFileGZOutputStream.h>
+#include <mrpt/maps/CColouredPointsMap.h>
+#include <mrpt/maps/CPointsMap.h>
 #include <mrpt/opengl/CAngularObservationMesh.h>  // It's in lib mrpt-maps
 #include <mrpt/opengl/CAssimpModel.h>
 #include <mrpt/opengl/CFBORender.h>
@@ -69,14 +73,11 @@ const std::string iniFileSect("CONF_LIN");
 #include <mrpt/system/CTicTac.h>
 #include <mrpt/system/filesystem.h>
 #include <mrpt/system/string_utils.h>
-
-#include <mrpt/maps/CColouredPointsMap.h>
-#include <mrpt/maps/CPointsMap.h>
 #if MRPT_HAS_LIBLAS
 #include <mrpt/maps/CPointsMap_liblas.h>
 #endif
 
-const mrpt::maps::CColouredPointsMap dummy_map;  // this is to enforce to load
+const mrpt::maps::CColouredPointsMap dummy_map;	 // this is to enforce to load
 // the mrpt-maps DLL, then
 // register all OpenGL classes
 // defined there.
@@ -104,19 +105,6 @@ wxBitmap MyArtProvider::CreateBitmap(
 
 // Used for feedback from the glcanvas component to its parent.
 _DSceneViewerFrame* theWindow = nullptr;
-
-#ifdef MRPT_OS_WINDOWS
-// Windows:
-#include <windows.h>
-#endif
-
-#ifdef MRPT_OS_APPLE
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
 
 #include <mutex>
 
@@ -205,8 +193,7 @@ void CMyGLCanvas::OnPostRenderSwapBuffers(double At, wxPaintDC& dc)
 	double estimatedFPS;
 	static double meanEstimatedFPS = 1;
 
-	if (At > 0)
-		estimatedFPS = 1 / At;
+	if (At > 0) estimatedFPS = 1 / At;
 	else
 		estimatedFPS = 0;
 
@@ -264,7 +251,7 @@ void CMyGLCanvas::OnCharCustom(wxKeyEvent& event)
 			// cout << "Time to build file list: " << tictac.Tac() << endl;
 
 			string curFileName = extractFileName(loadedFileName) + string(".") +
-								 extractFileExtension(loadedFileName);
+				extractFileExtension(loadedFileName);
 
 			// Find the current file:
 			CDirectoryExplorer::TFileInfoList::iterator it;
@@ -690,8 +677,8 @@ _DSceneViewerFrame::_DSceneViewerFrame(wxWindow* parent, wxWindowID id)
 	SetMenuBar(MenuBar1);
 	StatusBar1 = new wxStatusBar(this, ID_STATUSBAR1, 0, _T("ID_STATUSBAR1"));
 	int __wxStatusBarWidths_1[4] = {-10, -10, -4, -5};
-	int __wxStatusBarStyles_1[4] = {wxSB_NORMAL, wxSB_NORMAL, wxSB_NORMAL,
-									wxSB_NORMAL};
+	int __wxStatusBarStyles_1[4] = {
+		wxSB_NORMAL, wxSB_NORMAL, wxSB_NORMAL, wxSB_NORMAL};
 	StatusBar1->SetFieldsCount(4, __wxStatusBarWidths_1);
 	StatusBar1->SetStatusStyles(4, __wxStatusBarStyles_1);
 	SetStatusBar(StatusBar1);
@@ -870,6 +857,8 @@ void _DSceneViewerFrame::loadFromFile(
 
 		CFileGZInputStream f(fil);
 
+		const auto oldCanvasCamera = m_canvas->cameraParams();
+
 		static mrpt::system::CTicTac tictac;
 		auto openGLSceneRef = m_canvas->getOpenGLSceneRef();
 		{
@@ -927,6 +916,10 @@ void _DSceneViewerFrame::loadFromFile(
 			// Remove the camera from the object:
 			if (camIsCCameraObj) openGLSceneRef->removeObject(cam);
 		}
+		else
+		{
+			m_canvas->setCameraParams(oldCanvasCamera);
+		}
 
 		loadedFileName = fil;
 
@@ -969,16 +962,15 @@ void _DSceneViewerFrame::updateTitle()
 
 void _DSceneViewerFrame::OntimLoadFileCmdLineTrigger(wxTimerEvent&)
 {
-	timLoadFileCmdLine.Stop();  // One shot only.
+	timLoadFileCmdLine.Stop();	// One shot only.
 	// Open file if passed by the command line:
 	if (!global_fileToOpen.empty())
 	{
 		if (mrpt::system::strCmpI(
-				"3Dscene", mrpt::system::extractFileExtension(
-							   global_fileToOpen, true /*ignore .gz*/)))
-		{
-			loadFromFile(global_fileToOpen);
-		}
+				"3Dscene",
+				mrpt::system::extractFileExtension(
+					global_fileToOpen, true /*ignore .gz*/)))
+		{ loadFromFile(global_fileToOpen); }
 		else
 		{
 			std::cout << "Filename extension does not match `3Dscene`, "
@@ -1017,7 +1009,7 @@ void _DSceneViewerFrame::OntimAutoplay(wxTimerEvent& event)
 
 	// Continue?
 	if (btnAutoplay->GetValue())
-		m_autoplayTimer->Start(delayBetweenAutoplay, true);  // One-shot:
+		m_autoplayTimer->Start(delayBetweenAutoplay, true);	 // One-shot:
 }
 
 void _DSceneViewerFrame::OnMenuBackColor(wxCommandEvent& event)
@@ -1216,9 +1208,7 @@ void _DSceneViewerFrame::OnTravellingTrigger(wxTimerEvent& event)
 		if ((openGLSceneRef->viewportsCount() == 0) ||
 			!openGLSceneRef->getViewport("main") ||
 			(openGLSceneRef->getViewport("main")->size() == 0))
-		{
-			wxMessageBox(_("Canvas is empty"), _("Warning"), wxOK, this);
-		}
+		{ wxMessageBox(_("Canvas is empty"), _("Warning"), wxOK, this); }
 		else
 		{
 			// Change the camera
@@ -1258,8 +1248,7 @@ void _DSceneViewerFrame::OnTravellingTrigger(wxTimerEvent& event)
 					}
 				}
 
-				if (valid)
-					m_canvas->setCameraPointing(p.x(), p.y(), p.z());
+				if (valid) m_canvas->setCameraPointing(p.x(), p.y(), p.z());
 				else
 				{
 					// end of path:
@@ -1305,9 +1294,7 @@ void _DSceneViewerFrame::OnStartCameraTravelling(wxCommandEvent& event)
 		if ((openGLSceneRef->viewportsCount() == 0) ||
 			!openGLSceneRef->getViewport("main") ||
 			(openGLSceneRef->getViewport("main")->size() == 0))
-		{
-			wxMessageBox(_("Canvas is empty"), _("Warning"), wxOK, this);
-		}
+		{ wxMessageBox(_("Canvas is empty"), _("Warning"), wxOK, this); }
 		else
 		{
 			// Change the camera
@@ -1354,7 +1341,7 @@ void _DSceneViewerFrame::OnStartCameraTravelling(wxCommandEvent& event)
 
 			maxv = azimuth + max_value;
 
-			m_travelling_is_arbitrary = false;  // Circular
+			m_travelling_is_arbitrary = false;	// Circular
 			m_tTravelling.Start(100);
 
 			Refresh(false);
@@ -1454,8 +1441,9 @@ void _DSceneViewerFrame::OnmnuItemChangeMaxPointsPerOctreeNodeSelected(
 		_("Max. density of points in each octree (points/pixel^2):"),
 		_("Enter new value"),
 		wxString::Format(
-			_("%e"), (double)mrpt::global_settings::
-						 OCTREE_RENDER_MAX_DENSITY_POINTS_PER_SQPIXEL()),
+			_("%e"),
+			(double)mrpt::global_settings::
+				OCTREE_RENDER_MAX_DENSITY_POINTS_PER_SQPIXEL()),
 		this);
 
 	double N1, N2;
@@ -1722,15 +1710,9 @@ void _DSceneViewerFrame::OnMenuItemImportPLYPointCloud(wxCommandEvent& event)
 			{
 				switch (dlgPLY.rbIntFromXYZ->GetSelection())
 				{
-					case 1:
-						gl_points->enableColorFromX();
-						break;
-					case 2:
-						gl_points->enableColorFromY();
-						break;
-					case 3:
-						gl_points->enableColorFromZ();
-						break;
+					case 1: gl_points->enableColorFromX(); break;
+					case 2: gl_points->enableColorFromY(); break;
+					case 3: gl_points->enableColorFromZ(); break;
 				};
 			}
 
@@ -2080,22 +2062,22 @@ void _DSceneViewerFrame::OnmnuImportLASSelected(wxCommandEvent& event)
 			return;
 		}
 
-		mrpt::math::TPoint3D bb_min, bb_max;
+		mrpt::math::TBoundingBox bb;
 		{
 			wxBusyCursor busy;
 			if (gl_points_col)
 			{
 				gl_points_col->loadFromPointsMap(&pts_map);
-				gl_points_col->getBoundingBox(bb_min, bb_max);
+				bb = gl_points_col->getBoundingBox();
 			}
 			else
 			{
 				gl_points->loadFromPointsMap(&pts_map);
-				gl_points->getBoundingBox(bb_min, bb_max);
+				bb = gl_points->getBoundingBox();
 			}
 		}
 
-		const double scene_size = bb_min.distanceTo(bb_max);
+		const double scene_size = bb.min.distanceTo(bb.max);
 
 		// Set the point cloud as the only object in scene:
 		auto scene = std::make_shared<opengl::COpenGLScene>();
@@ -2105,7 +2087,7 @@ void _DSceneViewerFrame::OnmnuImportLASSelected(wxCommandEvent& event)
 		{
 			mrpt::opengl::CGridPlaneXY::Ptr obj =
 				mrpt::opengl::CGridPlaneXY::Create(
-					bb_min.x, bb_max.x, bb_min.y, bb_max.y, 0,
+					bb.min.x, bb.max.x, bb.min.y, bb.max.y, 0,
 					scene_size * 0.02);
 			obj->setColor(0.3f, 0.3f, 0.3f);
 			scene->insert(obj);
@@ -2123,15 +2105,9 @@ void _DSceneViewerFrame::OnmnuImportLASSelected(wxCommandEvent& event)
 		{
 			switch (dlgPLY.rbIntFromXYZ->GetSelection())
 			{
-				case 1:
-					gl_points->enableColorFromX();
-					break;
-				case 2:
-					gl_points->enableColorFromY();
-					break;
-				case 3:
-					gl_points->enableColorFromZ();
-					break;
+				case 1: gl_points->enableColorFromX(); break;
+				case 2: gl_points->enableColorFromY(); break;
+				case 3: gl_points->enableColorFromZ(); break;
 			};
 		}
 
@@ -2152,8 +2128,8 @@ void _DSceneViewerFrame::OnmnuImportLASSelected(wxCommandEvent& event)
 		if (gl_points_col) scene->insert(gl_points_col);
 
 		m_canvas->setCameraPointing(
-			(bb_min.x + bb_max.x) * 0.5, (bb_min.y + bb_max.y) * 0.5,
-			(bb_min.z + bb_max.z) * 0.5);
+			(bb.min.x + bb.max.x) * 0.5, (bb.min.y + bb.max.y) * 0.5,
+			(bb.min.z + bb.max.z) * 0.5);
 
 		m_canvas->setZoomDistance(2 * scene_size);
 		m_canvas->setAzimuthDegrees(45);
@@ -2175,9 +2151,9 @@ void _DSceneViewerFrame::OnmnuImportLASSelected(wxCommandEvent& event)
 		std::stringstream ss;
 		ss << pts_map.size() << " points loaded.\n"
 		   << "Bounding box:\n"
-		   << " X: " << bb_min.x << " <=> " << bb_max.x << "\n"
-		   << " Y: " << bb_min.y << " <=> " << bb_max.y << "\n"
-		   << " Z: " << bb_min.z << " <=> " << bb_max.z << "\n"
+		   << " X: " << bb.min.x << " <=> " << bb.max.x << "\n"
+		   << " Y: " << bb.min.y << " <=> " << bb.max.y << "\n"
+		   << " Z: " << bb.min.z << " <=> " << bb.max.z << "\n"
 		   << "LAS header info:\n"
 		   << "---------------------------------\n"
 		   << "FileSignature      : " << las_hdr.FileSignature << endl

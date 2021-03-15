@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -365,8 +365,7 @@ TEST(CImage, ScaleImage)
 	for (int pass = 0; pass < 2; pass++)
 	{
 		CImage c;
-		if (pass == 0)
-			c = a.makeDeepCopy();
+		if (pass == 0) c = a.makeDeepCopy();
 		else
 			a.scaleImage(c, 311, 211);
 		const auto cw = c.getWidth(), ch = c.getHeight();
@@ -568,4 +567,4 @@ TEST(CImage, DifferentAccessMethodsGray)
 	}
 }
 
-#endif  // MRPT_HAS_OPENCV
+#endif	// MRPT_HAS_OPENCV

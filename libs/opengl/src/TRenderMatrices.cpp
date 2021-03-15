@@ -2,16 +2,17 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
-#include <mrpt/math/geometry.h>  // crossProduct3D()
+#include "opengl-precomp.h"	 // Precompiled header
+//
+#include <mrpt/math/geometry.h>	 // crossProduct3D()
 #include <mrpt/math/ops_containers.h>  // dotProduct()
 #include <mrpt/opengl/TRenderMatrices.h>
+
 #include <Eigen/Dense>
 
 using namespace mrpt::opengl;
@@ -67,8 +68,7 @@ void TRenderMatrices::computeProjectionMatrix(float znear, float zfar)
 		float Ax = eyeDistance * 0.5f;
 		float Ay = eyeDistance * 0.5f;
 
-		if (ratio > 1)
-			Ax *= ratio;
+		if (ratio > 1) Ax *= ratio;
 		else
 		{
 			if (ratio != 0) Ay /= ratio;

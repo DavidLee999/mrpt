@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -54,7 +54,7 @@ class CWirelessPowerGridMap2D : public CRandomFieldGridMap2D
 			const mrpt::config::CConfigFileBase& source,
 			const std::string& section) override;  // See base docs
 		void dumpToTextStream(
-			std::ostream& out) const override;  // See base docs
+			std::ostream& out) const override;	// See base docs
 
 	} insertionOptions;
 
@@ -77,7 +77,7 @@ class CWirelessPowerGridMap2D : public CRandomFieldGridMap2D
 		const mrpt::poses::CPose3D* robotPose = nullptr) override;
 	double internal_computeObservationLikelihood(
 		const mrpt::obs::CObservation& obs,
-		const mrpt::poses::CPose3D& takenFrom) override;
+		const mrpt::poses::CPose3D& takenFrom) const override;
 
 	MAP_DEFINITION_START(CWirelessPowerGridMap2D)
 	/** See CWirelessPowerGridMap2D::CWirelessPowerGridMap2D */

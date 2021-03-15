@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -14,6 +14,7 @@ namespace mrpt::math
 {
 /** 3D twist: 3D velocity vector (vx,vy,vz) + angular velocity (wx,wy,wz)
  * \sa mrpt::math::TTwist2D, mrpt::math::TPose3D
+ * \ingroup geometry_grp
  */
 struct TTwist3D : public internal::ProvideStaticResize<TTwist3D>
 {
@@ -40,20 +41,13 @@ struct TTwist3D : public internal::ProvideStaticResize<TTwist3D>
 	{
 		switch (i)
 		{
-			case 0:
-				return vx;
-			case 1:
-				return vy;
-			case 2:
-				return vz;
-			case 3:
-				return wx;
-			case 4:
-				return wy;
-			case 5:
-				return wz;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return vx;
+			case 1: return vy;
+			case 2: return vz;
+			case 3: return wx;
+			case 4: return wy;
+			case 5: return wz;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/// \overload
@@ -61,20 +55,13 @@ struct TTwist3D : public internal::ProvideStaticResize<TTwist3D>
 	{
 		switch (i)
 		{
-			case 0:
-				return vx;
-			case 1:
-				return vy;
-			case 2:
-				return vz;
-			case 3:
-				return wx;
-			case 4:
-				return wy;
-			case 5:
-				return wz;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return vx;
+			case 1: return vy;
+			case 2: return vz;
+			case 3: return wx;
+			case 4: return wy;
+			case 5: return wz;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 
@@ -108,7 +95,8 @@ struct TTwist3D : public internal::ProvideStaticResize<TTwist3D>
 	void asVector(VECTORLIKE& v) const
 	{
 		v.resize(6);
-		for (int i = 0; i < 6; i++) v[i] = (*this)[i];
+		for (int i = 0; i < 6; i++)
+			v[i] = (*this)[i];
 	}
 	template <typename VECTORLIKE>
 	VECTORLIKE asVector() const
@@ -123,7 +111,8 @@ struct TTwist3D : public internal::ProvideStaticResize<TTwist3D>
 	void fromVector(const VECTORLIKE& v)
 	{
 		ASSERT_EQUAL_(v.size(), 6);
-		for (int i = 0; i < 6; i++) (*this)[i] = v[i];
+		for (int i = 0; i < 6; i++)
+			(*this)[i] = v[i];
 	}
 	bool operator==(const TTwist3D& o) const;
 	bool operator!=(const TTwist3D& o) const;

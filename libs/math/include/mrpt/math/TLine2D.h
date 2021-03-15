@@ -2,17 +2,21 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 #pragma once
 
 #include <mrpt/math/TPoseOrPoint.h>
+
 #include <array>
 
 namespace mrpt::math
 {
+/** \addtogroup  geometry_grp
+ * @{ */
+
 /** 2D line without bounds, represented by its equation \f$Ax+By+C=0\f$.
  * \sa TLine3D,TSegment2D,TPolygon2D,TPoint2D
  */
@@ -116,6 +120,8 @@ mrpt::serialization::CArchive& operator<<(
 
 /** Text streaming function */
 std::ostream& operator<<(std::ostream& o, const TLine2D& p);
+
+/** @} */
 
 }  // namespace mrpt::math
 

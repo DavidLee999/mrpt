@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/core/bits_mem.h>
 #include <mrpt/maps/CWeightedPointsMap.h>
 #include <mrpt/serialization/CArchive.h>
@@ -104,10 +104,7 @@ void CWeightedPointsMap::impl_copyFrom(const CPointsMap& obj)
 	CPointsMap::base_copyFrom(obj);
 
 	const auto* pW = dynamic_cast<const CWeightedPointsMap*>(&obj);
-	if (pW)
-	{
-		pointWeight = pW->pointWeight;
-	}
+	if (pW) { pointWeight = pW->pointWeight; }
 }
 
 /*---------------------------------------------------------------
@@ -178,8 +175,7 @@ void CWeightedPointsMap::serializeFrom(
 
 			if (version >= 1)
 			{
-				if (version >= 2)
-					in >> genericMapParams;
+				if (version >= 2) in >> genericMapParams;
 				else
 				{
 					bool disableSaveAs3DObject;
@@ -214,8 +210,7 @@ void CWeightedPointsMap::serializeFrom(
 			likelihoodOptions.readFromStream(in);  // Added in version 5
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 }
 

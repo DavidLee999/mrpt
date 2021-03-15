@@ -34,24 +34,13 @@ do
      esac
 done
 
-if [ -f version_prefix.txt ];
-then
-	MRPT_VERSION_STR=`head -n 1 version_prefix.txt`
-  MRPT_VERSION_MAJOR=${MRPT_VERSION_STR:0:1}
-	MRPT_VERSION_MINOR=${MRPT_VERSION_STR:2:1}
-	MRPT_VERSION_PATCH=${MRPT_VERSION_STR:4:1}
-	MRPT_VER_MM="${MRPT_VERSION_MAJOR}.${MRPT_VERSION_MINOR}"
-	MRPT_VER_MMP="${MRPT_VERSION_MAJOR}.${MRPT_VERSION_MINOR}.${MRPT_VERSION_PATCH}"
-else
-	echo "Error: cannot find version_prefix.txt!!"
-	exit 1
-fi
+source packaging/parse_mrpt_version.sh
 
 # Append snapshot?
 if [ $APPEND_SNAPSHOT_NUM == "1" ];
 then
         CUR_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-        source $CUR_SCRIPT_DIR/prepare_debian_gen_snapshot_version.sh  # populate MRPT_SNAPSHOT_VERSION
+        source $CUR_SCRIPT_DIR/generate_snapshot_version.sh  # populate MRPT_SNAPSHOT_VERSION
 
         MRPT_VERSION_STR="${MRPT_VERSION_STR}~snapshot${MRPT_SNAPSHOT_VERSION}${APPEND_LINUX_DISTRO}"
 else
@@ -72,7 +61,7 @@ then
   #then
   #  echo "## release file already exists. Reusing it."
   #else
-    source scripts/prepare_release.sh
+    source packaging/prepare_release.sh
     echo
     echo "## Done prepare_release.sh"
   #fi
@@ -137,6 +126,12 @@ cp -r ${MRPT_EXTERN_DEBIAN_DIR}/* debian
 if [ $IS_FOR_UBUNTU == "1" ];
 then
 	cp ${MRPT_EXTERN_UBUNTU_PPA_DIR}/control.in debian/
+
+  # TL/DR: Remove this line far in the future (now: Dec 2020)
+  # This is needed until Ubuntu uses the now (Dec 2020) experimental dh feature
+  # of describing dh compat levels by means of a build-depends entry instead of
+  # the old file debian/compat:
+  echo "10" > debian/compat
 fi
 
 # Export signing pub key:
@@ -146,6 +141,8 @@ gpg --export --export-options export-minimal --armor > debian/upstream/signing-k
 # Parse debian/ control.in --> control
 mv debian/control.in debian/control
 sed -i "s/@MRPT_VER_MM@/${MRPT_VER_MM}/g" debian/control
+sed -i "s/@DEB_EXTRA_BUILD_DEPS@/${DEB_EXTRA_BUILD_DEPS}/g" debian/control
+sed -i "s/@DEB_NANOFLANN_DEP@/${DEB_NANOFLANN_DEP}/g" debian/control
 
 # Replace the text "REPLACE_HERE_EXTRA_CMAKE_PARAMS" in the "debian/rules" file
 # with: ${${VALUE_EXTRA_CMAKE_PARAMS}}

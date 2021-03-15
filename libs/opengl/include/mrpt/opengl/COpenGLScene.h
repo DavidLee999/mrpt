@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -96,7 +96,8 @@ class COpenGLScene : public mrpt::serialization::CSerializable
 		const T_it& begin, const T_it& end,
 		const std::string& vpn = std::string("main"))
 	{
-		for (T_it it = begin; it != end; it++) insert(*it, vpn);
+		for (T_it it = begin; it != end; it++)
+			insert(*it, vpn);
 	}
 
 	/**Creates a new viewport, adding it to the scene and returning a pointer to
@@ -200,8 +201,7 @@ class COpenGLScene : public mrpt::serialization::CSerializable
 
 	/** Evaluates the bounding box of the scene in the given viewport (default:
 	 * "main"). */
-	void getBoundingBox(
-		mrpt::math::TPoint3D& bb_min, mrpt::math::TPoint3D& bb_max,
+	mrpt::math::TBoundingBox getBoundingBox(
 		const std::string& vpn = std::string("main")) const;
 
 	/** Recursive depth-first visit all objects in all viewports of the scene,

@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -33,4 +33,4 @@ class NanoGUICanvasHeadless : public mrpt::gui::CGlCanvasBaseHeadless
 	void scrollEvent(const nanogui::Vector2i& p, const nanogui::Vector2f& rel);
 };
 }  // namespace mrpt::gui::internal
-#endif  // MRPT_HAS_NANOGUI
+#endif	// MRPT_HAS_NANOGUI

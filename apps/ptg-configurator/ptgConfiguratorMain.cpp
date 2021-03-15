@@ -2,12 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "ptgConfiguratorMain.h"
+
 #include <mrpt/gui/about_box.h>
 #include <wx/msgdlg.h>
 
@@ -20,13 +21,13 @@
 #include <wx/settings.h>
 #include <wx/string.h>
 //*)
-#include <mrpt/system/os.h>
-
 #include <mrpt/gui/WxUtils.h>
 #include <mrpt/gui/wx28-fixes.h>
 #include <mrpt/math/TLine3D.h>
 #include <mrpt/math/TObject3D.h>
+#include <mrpt/system/os.h>
 #include <mrpt/system/string_utils.h>
+
 #include "../wx-common/mrpt_logo.xpm"
 #include "imgs/main_icon.xpm"
 
@@ -264,7 +265,8 @@ ptgConfiguratorframe::ptgConfiguratorframe(wxWindow* parent, wxWindowID id)
 		wxDefaultValidator, _T("ID_SLIDER1"));
 	FlexGridSizer4->Add(
 		slidPathHighlight, 1,
-		wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5);
+		wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL,
+		5);
 	edIndexHighlightPath = new wxSpinCtrl(
 		Panel1, ID_SPINCTRL2, _T("0"), wxDefaultPosition, wxDefaultSize, 0, 0,
 		100, 0, _T("ID_SPINCTRL2"));
@@ -434,7 +436,7 @@ ptgConfiguratorframe::ptgConfiguratorframe(wxWindow* parent, wxWindowID id)
 	cbShowClearance = new wxCheckBox(
 		Panel2, ID_CHECKBOX6, _("Clearance diagram"), wxDefaultPosition,
 		wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
-	cbShowClearance->SetValue(true);
+	cbShowClearance->SetValue(false);
 	FlexGridSizer15->Add(
 		cbShowClearance, 1,
 		wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5);
@@ -615,8 +617,8 @@ ptgConfiguratorframe::ptgConfiguratorframe(wxWindow* parent, wxWindowID id)
 	SetMenuBar(MenuBar1);
 	StatusBar1 = new wxStatusBar(this, ID_STATUSBAR1, 0, _T("ID_STATUSBAR1"));
 	int __wxStatusBarWidths_1[4] = {-2, -5, -3, -3};
-	int __wxStatusBarStyles_1[4] = {wxSB_NORMAL, wxSB_NORMAL, wxSB_NORMAL,
-									wxSB_NORMAL};
+	int __wxStatusBarStyles_1[4] = {
+		wxSB_NORMAL, wxSB_NORMAL, wxSB_NORMAL, wxSB_NORMAL};
 	StatusBar1->SetFieldsCount(4, __wxStatusBarWidths_1);
 	StatusBar1->SetStatusStyles(4, __wxStatusBarStyles_1);
 	SetStatusBar(StatusBar1);
@@ -680,6 +682,7 @@ ptgConfiguratorframe::ptgConfiguratorframe(wxWindow* parent, wxWindowID id)
 	gl_TPSpace_TP_obstacles = mrpt::opengl::CSetOfObjects::Create();
 	gl_TPSpace_clearance =
 		mrpt::opengl::CMesh::Create(true, -5.0f, 5.0f, -5.0f, 5.0f);
+	gl_TPSpace_clearance->setVisibility(false);
 	gl_TPSpace_clearance_interp =
 		mrpt::opengl::CMesh::Create(true, -5.0f, 5.0f, -5.0f, 5.0f);
 	gl_TPSpace_clearance_interp->setVisibility(false);
@@ -739,7 +742,7 @@ ptgConfiguratorframe::ptgConfiguratorframe(wxWindow* parent, wxWindowID id)
 	{
 		gl_axis_WS = mrpt::opengl::CAxis::Create(
 			-10.0, -10.0, 0, 10.0, 10.0, 0.0, 1.0, 2.0);
-		gl_axis_WS->setTextScale(0.20f);
+		gl_axis_WS->setTextScale(0.10f);
 		gl_axis_WS->enableTickMarks(true, true, true);
 		gl_axis_WS->setColor_u8(mrpt::img::TColor(30, 30, 30, 50));
 		gl_axis_WS->setTextLabelOrientation(0, 0, 0, 0);
@@ -750,7 +753,7 @@ ptgConfiguratorframe::ptgConfiguratorframe(wxWindow* parent, wxWindowID id)
 	{
 		gl_axis_TPS = mrpt::opengl::CAxis::Create(
 			-1.0, -1.0, 0, 1.0, 1.0, 0.0, 0.25, 2.0);
-		gl_axis_TPS->setTextScale(0.04f);
+		gl_axis_TPS->setTextScale(0.025f);
 		gl_axis_TPS->enableTickMarks(true, true, false);
 		gl_axis_TPS->setColor_u8(mrpt::img::TColor(30, 30, 30, 50));
 		gl_axis_TPS->setTextLabelOrientation(0, 0, 0, 0);
@@ -796,9 +799,11 @@ ptgConfiguratorframe::ptgConfiguratorframe(wxWindow* parent, wxWindowID id)
 			mrpt::rtti::getAllRegisteredClasses();
 		for (auto lstClasse : lstClasses)
 		{
-			if (!lstClasse->derivedFrom("CParameterizedTrajectoryGenerator") ||
+			if (!lstClasse->derivedFrom(
+					"mrpt::nav::CParameterizedTrajectoryGenerator") ||
 				!mrpt::system::os::_strcmpi(
-					lstClasse->className, "CParameterizedTrajectoryGenerator"))
+					lstClasse->className,
+					"mrpt::nav::CParameterizedTrajectoryGenerator"))
 				continue;
 			cbPTGClass->AppendString(lstClasse->className);
 		}
@@ -924,14 +929,11 @@ void ptgConfiguratorframe::rebuild3Dview()
 	// Limits:
 	gl_axis_WS->setAxisLimits(-refDist, -refDist, .0f, refDist, refDist, .0f);
 
-	double tx = 10.0, ty = .0;  // Target in WS
+	double tx = 10.0, ty = .0;	// Target in WS
 	{
 		bool ok_x = edTargetX->GetValue().ToDouble(&tx);
 		bool ok_y = edTargetY->GetValue().ToDouble(&ty);
-		if (ok_x && ok_y)
-		{
-			gl_WS_target->setLocation(tx, ty, 0);
-		}
+		if (ok_x && ok_y) { gl_WS_target->setLocation(tx, ty, 0); }
 	}
 
 	if (ptg && ptg->isInitialized())
@@ -1024,11 +1026,10 @@ void ptgConfiguratorframe::rebuild3Dview()
 
 			const double max_dist = TP_Obstacles[k];
 
-			mrpt::opengl::CSetOfLines& sol =
-				cbHighlightOnePath->IsChecked() &&
-						k == size_t(edIndexHighlightPath->GetValue())
-					? *gl_robot_ptg_prediction_highlight
-					: *gl_robot_ptg_prediction;
+			mrpt::opengl::CSetOfLines& sol = cbHighlightOnePath->IsChecked() &&
+					k == size_t(edIndexHighlightPath->GetValue())
+				? *gl_robot_ptg_prediction_highlight
+				: *gl_robot_ptg_prediction;
 
 			ptg->renderPathAsSimpleLine(k, sol, 0.10f, max_dist);
 
@@ -1091,11 +1092,10 @@ void ptgConfiguratorframe::rebuild3Dview()
 				const mrpt::math::TTwist2D curVel = ptg->getPathTwist(k, j);
 
 				// Head calc:
-				const double head2dir =
-					(curVel.vy != 0 || curVel.vx != 0)
-						? mrpt::math::angDistance(
-							  ::atan2(curVel.vy, curVel.vx), curPose.phi)
-						: .0;
+				const double head2dir = (curVel.vy != 0 || curVel.vx != 0)
+					? mrpt::math::angDistance(
+						  ::atan2(curVel.vy, curVel.vx), curPose.phi)
+					: .0;
 
 				if (is_selected_path)
 				{
@@ -1235,9 +1235,11 @@ void ptgConfiguratorframe::loadPlugin()
 			mrpt::rtti::getAllRegisteredClasses();
 		for (auto lstClasse : lstClasses)
 		{
-			if (!lstClasse->derivedFrom("CParameterizedTrajectoryGenerator") ||
+			if (!lstClasse->derivedFrom(
+					"mrpt::nav::CParameterizedTrajectoryGenerator") ||
 				!mrpt::system::os::_strcmpi(
-					lstClasse->className, "CParameterizedTrajectoryGenerator"))
+					lstClasse->className,
+					"mrpt::nav::CParameterizedTrajectoryGenerator"))
 				continue;
 			cbPTGClass->AppendString(lstClasse->className);
 		}
@@ -1338,8 +1340,7 @@ void ptgConfiguratorframe::Onplot3DMouseMove(wxMouseEvent& event)
 				rebuild3Dview();
 			}
 			break;
-			default:
-				break;
+			default: break;
 		};
 		StatusBar1->SetStatusText(
 			wxString::Format(
@@ -1354,7 +1355,7 @@ void ptgConfiguratorframe::Onplot3DMouseMove(wxMouseEvent& event)
 
 void ptgConfiguratorframe::Onplot3DMouseClick(wxMouseEvent& event)
 {
-	m_plot->SetCursor(*wxSTANDARD_CURSOR);  // End of cross cursor
+	m_plot->SetCursor(*wxSTANDARD_CURSOR);	// End of cross cursor
 	m_cursorPickState = cpsNone;  // end of mode
 
 	// Do normal process in that class:

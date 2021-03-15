@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -79,9 +79,10 @@ void export_utils()
 	// TColorf
 	{
 		class_<TColorf>(
-			"TColorf", init<optional<float, float, float, float>>(
-						   args("r", "g", "b", "alpha"),
-						   "A RGB color - floats in the range [0,1]."))
+			"TColorf",
+			init<optional<float, float, float, float>>(
+				args("r", "g", "b", "alpha"),
+				"A RGB color - floats in the range [0,1]."))
 			.def_readwrite("R", &TColorf::R, "red")
 			.def_readwrite("G", &TColorf::R, "green")
 			.def_readwrite("B", &TColorf::R, "blue")

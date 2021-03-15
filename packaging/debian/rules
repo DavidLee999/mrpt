@@ -41,6 +41,7 @@ CMAKE_FLAGS = \
 	-DMRPT_ALLOW_LGPLV3=ON \
 	-DCMAKE_MRPT_USE_DEB_POSTFIXS="1" \
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
+	-DDISABLE_BFD=ON \
 	$(CMAKE_ARCH_FLAGS) \
 	REPLACE_HERE_EXTRA_CMAKE_PARAMS
 
@@ -49,6 +50,12 @@ CMAKE_FLAGS = \
 
 %:
 	dh $@ --buildsystem=cmake
+
+override_dh_auto_clean:
+	dh_auto_clean -O--buildsystem=cmake
+	# Clean possible leftover from a former build:
+	rm -fr debian/usr
+	find doc/graphslam-engine-guide/ -maxdepth 1  -type f ! -name '*.tex' ! -name 'Makefile' -delete
 
 override_dh_auto_build-arch:
 	dh_auto_build -O--buildsystem=cmake
@@ -105,6 +112,17 @@ override_dh_install:
 
 	# Move headers to -dev directories:
 	cp -vr $(CURDIR)/debian/usr/libmrpt-*dev $(CURDIR)/debian/
+
+	# If we are in an old (<21.04) Ubuntu distro, manually include nanoflann
+	# into mrpt-math-dev as a workaround to the lack of a system library:
+	if [ -d $(CURDIR)/obj-$(DEB_HOST_MULTIARCH)/3rdparty/nanoflann ]; then \
+	  make -C $(CURDIR)/obj-$(DEB_HOST_MULTIARCH)/3rdparty/nanoflann install; \
+	  mv -v $(CURDIR)/debian/usr/include/nanoflann.hpp $(CURDIR)/debian/libmrpt-math-dev/usr/include/; \
+	  mkdir -vp $(CURDIR)/debian/libmrpt-math-dev/usr/share/cmake/nanoflann; \
+	  mv -v $(CURDIR)/debian/usr/share/cmake/nanoflann/* $(CURDIR)/debian/libmrpt-math-dev/usr/share/cmake/nanoflann/; \
+	  mkdir -vp $(CURDIR)/debian/libmrpt-math-dev/usr/share/pkgconfig/; \
+	  mv -v $(CURDIR)/debian/usr/share/pkgconfig/nanoflann.pc $(CURDIR)/debian/libmrpt-math-dev/usr/share/pkgconfig/; \
+	fi;
 
 	# Move python stuff:
 #	mkdir -p $(CURDIR)/debian/python-mrpt/usr/lib

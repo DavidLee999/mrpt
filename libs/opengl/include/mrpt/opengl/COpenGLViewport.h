@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -22,6 +22,7 @@
 #include <mrpt/serialization/CSerializable.h>
 #include <mrpt/system/CObservable.h>
 #include <mrpt/system/mrptEvent.h>
+
 #include <map>
 
 namespace mrpt::img
@@ -292,8 +293,9 @@ class COpenGLViewport : public mrpt::serialization::CSerializable,
 		// If not found directly, search recursively:
 		for (const auto& o : m_objects)
 		{
-			if (o && o->GetRuntimeClass() ==
-						 CLASS_ID_NAMESPACE(CSetOfObjects, mrpt::opengl))
+			if (o &&
+				o->GetRuntimeClass() ==
+					CLASS_ID_NAMESPACE(CSetOfObjects, mrpt::opengl))
 			{
 				typename T::Ptr obj = std::dynamic_pointer_cast<T>(
 					std::dynamic_pointer_cast<CSetOfObjects>(o)
@@ -317,10 +319,8 @@ class COpenGLViewport : public mrpt::serialization::CSerializable,
 	opengl::CCamera& getCamera() { return m_camera; }
 	/** Get a reference to the camera associated with this viewport. */
 	const opengl::CCamera& getCamera() const { return m_camera; }
-	/** Evaluates the bounding box of this object (including possible children)
-	 * in the coordinate frame of the object parent. */
-	void getBoundingBox(
-		mrpt::math::TPoint3D& bb_min, mrpt::math::TPoint3D& bb_max) const;
+
+	mrpt::math::TBoundingBox getBoundingBox() const;
 
 	/** @} */  // end of Contained objects set/get/search
 
@@ -436,7 +436,8 @@ inline COpenGLViewport::Ptr& operator<<(
 inline COpenGLViewport::Ptr& operator<<(
 	COpenGLViewport::Ptr& s, const std::vector<CRenderizable::Ptr>& v)
 {
-	for (const auto& it : v) s->insert(it);
+	for (const auto& it : v)
+		s->insert(it);
 	return s;
 }
 
@@ -465,7 +466,7 @@ class mrptEventGLPreRender : public mrpt::system::mrptEvent
 	{
 	}
 	const COpenGLViewport* const source_viewport;
-};  // End of class def.
+};	// End of class def.
 
 /**  An event sent by an mrpt::opengl::COpenGLViewport after calling the scene
  * OpenGL drawing primitives and before doing a glSwapBuffers
@@ -491,7 +492,7 @@ class mrptEventGLPostRender : public mrpt::system::mrptEvent
 	{
 	}
 	const COpenGLViewport* const source_viewport;
-};  // End of class def.
+};	// End of class def.
 
 /** @} */
 

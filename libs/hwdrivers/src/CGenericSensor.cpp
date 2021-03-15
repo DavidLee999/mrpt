@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "hwdrivers-precomp.h"  // Precompiled headers
-
+#include "hwdrivers-precomp.h"	// Precompiled headers
+//
 #include <mrpt/hwdrivers/CGenericSensor.h>
 #include <mrpt/obs/CAction.h>
 #include <mrpt/obs/CObservation.h>
@@ -62,9 +62,7 @@ void CGenericSensor::appendObservations(
 			TTimeStamp timestamp;
 
 			if (obj->GetRuntimeClass()->derivedFrom(CLASS_ID(CAction)))
-			{
-				timestamp = dynamic_cast<CAction*>(obj.get())->timestamp;
-			}
+			{ timestamp = dynamic_cast<CAction*>(obj.get())->timestamp; }
 			else if (obj->GetRuntimeClass()->derivedFrom(
 						 CLASS_ID(CObservation)))
 			{
@@ -86,7 +84,7 @@ void CGenericSensor::getObservations(TListObservations& lstObjects)
 {
 	std::lock_guard<std::mutex> lock(m_csObjList);
 	lstObjects = m_objList;
-	m_objList.clear();  // Memory of objects will be freed by invoker.
+	m_objList.clear();	// Memory of objects will be freed by invoker.
 }
 
 /*-------------------------------------------------------------

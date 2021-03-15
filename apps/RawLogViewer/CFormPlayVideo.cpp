@@ -2,13 +2,12 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "CFormPlayVideo.h"
-#include "xRawLogViewerMain.h"
 
 #include <wx/app.h>
 #include <wx/dcclient.h>
@@ -16,6 +15,8 @@
 #include <wx/dirdlg.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+
+#include "xRawLogViewerMain.h"
 
 //(*InternalHeaders(CFormPlayVideo)
 #include <wx/artprov.h>
@@ -501,10 +502,7 @@ void CFormPlayVideo::OnbtnPlayClick(wxCommandEvent& event)
 		size_t nImgs = 0, count = 0;
 
 		// If we are playing from memory, continue:
-		if (!fil)
-		{
-			count = edIndex->GetValue();
-		}
+		if (!fil) { count = edIndex->GetValue(); }
 
 		progressBar->SetRange(
 			0, fil ? (int)fil->getTotalBytesCount() : (int)rawlog.size());
@@ -516,10 +514,7 @@ void CFormPlayVideo::OnbtnPlayClick(wxCommandEvent& event)
 			wxTheApp->Yield();
 			CSerializable::Ptr obj;
 
-			if (fil)
-			{
-				archiveFrom(*fil) >> obj;
-			}
+			if (fil) { archiveFrom(*fil) >> obj; }
 			else
 			{
 				obj = rawlog.getAsGeneric(count);
@@ -529,9 +524,7 @@ void CFormPlayVideo::OnbtnPlayClick(wxCommandEvent& event)
 			bool doDelay = false;
 
 			if (IS_CLASS(*obj, CSensoryFrame))
-			{
-				doDelay = showSensoryFrame(obj.get(), nImgs);
-			}
+			{ doDelay = showSensoryFrame(obj.get(), nImgs); }
 			else if (IS_DERIVED(*obj, CObservation))
 			{
 				CSensoryFrame sf;
@@ -674,9 +667,6 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 	// Find an image to show:
 	CImage* imgShow = nullptr;
 
-	// Displayed images:
-	// displayedImgs.resize(3);
-
 	// unload current imgs:
 	for (auto& displayedImg : displayedImgs)
 		if (displayedImg) displayedImg->unload();
@@ -689,11 +679,11 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 		wxStaticText* theLabel = nullptr;
 
 		for (int img_idx_sf = 0; img_idx_sf < 3;
-			 img_idx_sf++)  // Up to 3 images maximum:
+			 img_idx_sf++)	// Up to 3 images maximum:
 		{
 			CObservationImage::Ptr obsImg =
 				sf->getObservationByClass<CObservationImage>(img_idx_sf);
-			if (!obsImg) break;  // No more images, go on...
+			if (!obsImg) break;	 // No more images, go on...
 
 			// Onto which panel to draw??
 			if (!orderByYaw && !orderByY)
@@ -713,8 +703,7 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 						thePanel = pnRight2;
 						theLabel = lbCam3;
 						break;
-					default:
-						ASSERT_(false);
+					default: ASSERT_(false);
 				};
 			}
 			else
@@ -753,7 +742,7 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 					}
 					else
 					{
-						thePanel = pnRight;  // Center
+						thePanel = pnRight;	 // Center
 						theLabel = lbCam2;
 					}
 				}
@@ -786,6 +775,7 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 			// Draw image:
 			drawHorzRules(*imgShow);
 			wxImage* wxIMG = mrpt::gui::MRPTImage2wxImage(*imgShow);
+			imgShow->unload();	// for delayed-loaded rawlogs
 
 			wxWindowDC dc(thePanel);
 			wxMemoryDC tmpDc;
@@ -846,8 +836,7 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 
 				drawHorzRules(*imgShow);
 				wxImage* wxIMG = mrpt::gui::MRPTImage2wxImage(*imgShow);
-				imgShow->unload();  // for delayed-loaded rawlogs, save lots of
-				// memory!
+				imgShow->unload();	// for delayed-loaded rawlogs
 
 				wxWindowDC dc(pnLeft);
 				wxMemoryDC tmpDc;
@@ -888,8 +877,7 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 
 				drawHorzRules(*imgShow);
 				wxImage* wxIMG = mrpt::gui::MRPTImage2wxImage(*imgShow);
-				imgShow->unload();  // for delayed-loaded rawlogs, save lots of
-				// memory!
+				imgShow->unload();	// for delayed-loaded rawlogs
 
 				wxWindowDC dc(pnRight);
 				wxMemoryDC tmpDc;
@@ -931,8 +919,7 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 
 				drawHorzRules(*imgShow);
 				wxImage* wxIMG = mrpt::gui::MRPTImage2wxImage(*imgShow);
-				imgShow->unload();  // for delayed-loaded rawlogs, save lots of
-				// memory!
+				imgShow->unload();	// for delayed-loaded rawlogs
 
 				wxWindowDC dc(pnRight);
 				wxMemoryDC tmpDc;
@@ -983,8 +970,7 @@ bool CFormPlayVideo::showSensoryFrame(void* SF, size_t& nImgs)
 
 				drawHorzRules(*imgShow);
 				wxImage* wxIMG = mrpt::gui::MRPTImage2wxImage(*imgShow);
-				imgShow->unload();  // for delayed-loaded rawlogs, save lots of
-				// memory!
+				imgShow->unload();	// for delayed-loaded rawlogs
 
 				wxWindowDC dc(pnLeft);
 				wxMemoryDC tmpDc;
@@ -1135,10 +1121,7 @@ void CFormPlayVideo::OncbImageDirsSelect(wxCommandEvent& event)
 	wxString dir = cbImageDirs->GetValue();
 	string dirc = string(dir.mb_str());
 
-	if (mrpt::system::fileExists(dirc))
-	{
-		CImage::setImagesPathBase(dirc);
-	}
+	if (mrpt::system::fileExists(dirc)) { CImage::setImagesPathBase(dirc); }
 	else
 	{
 		wxMessageBox(

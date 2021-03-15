@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -10,12 +10,14 @@
 
 #include <mrpt/math/TPoint3D.h>
 #include <mrpt/math/TPoseOrPoint.h>
+
 #include <vector>
 
 namespace mrpt::math
 {
 /** 3D polygon, inheriting from std::vector<TPoint3D>
  * \sa TPolygon2D,TSegment3D,TLine3D,TPlane,TPoint3D
+ * \ingroup geometry_grp
  */
 class TPolygon3D : public std::vector<TPoint3D>
 {

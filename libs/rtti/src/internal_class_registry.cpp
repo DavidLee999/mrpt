@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "rtti-precomp.h"  // Precompiled headers
-
+//
 #include <mrpt/rtti/CObject.h>
 
 #include <atomic>
@@ -134,10 +134,7 @@ class CClassRegistry
 	{
 		std::string ret = n;
 		const auto pos = ret.rfind("::");
-		if (pos != std::string::npos)
-		{
-			return ret.substr(pos + 2);
-		}
+		if (pos != std::string::npos) { return ret.substr(pos + 2); }
 		return ret;
 	}
 
@@ -160,7 +157,7 @@ class CClassRegistry
  */
 void mrpt::rtti::registerAllPendingClasses()
 {
-	if (!pending_class_registers_modified) return;  // Quick return
+	if (!pending_class_registers_modified) return;	// Quick return
 
 	while (pending_class_registers_count() != 0)
 	{
@@ -169,10 +166,7 @@ void mrpt::rtti::registerAllPendingClasses()
 		--pending_class_registers_count();
 
 		// Call it:
-		if (ptrToPtr != nullptr)
-		{
-			(*ptrToPtr)();
-		}
+		if (ptrToPtr != nullptr) { (*ptrToPtr)(); }
 	}
 	pending_class_registers_modified = false;
 }
@@ -226,10 +220,7 @@ std::vector<const TRuntimeClassId*>
 	const auto lst = mrpt::rtti::getAllRegisteredClasses();
 	for (const auto& c : lst)
 	{
-		if (c->derivedFrom(parent_id) && c != parent_id)
-		{
-			res.push_back(c);
-		}
+		if (c->derivedFrom(parent_id) && c != parent_id) { res.push_back(c); }
 	}
 	return res;
 }

@@ -2,14 +2,15 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "core-precomp.h"  // Precompiled headers
-
+//
 #include <mrpt/core/format.h>
+
 #include <cstdarg>
 
 // A sprintf-like function for std::string
@@ -37,10 +38,7 @@ std::string mrpt::format(const char* fmt, ...)
 		length *= 2;
 
 		// Ok?
-		if (result >= 0)
-		{
-			buffer.resize(result);
-		}
+		if (result >= 0) { buffer.resize(result); }
 	}
 	return buffer;
 }

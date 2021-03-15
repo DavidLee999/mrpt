@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
+#include "opengl-precomp.h"	 // Precompiled header
+//
 #include <mrpt/opengl/CRenderizableShaderTriangles.h>
 #include <mrpt/opengl/Shader.h>
 #include <mrpt/opengl/TLightParameters.h>
@@ -106,4 +106,45 @@ void CRenderizableShaderTriangles::render(const RenderContext& rc) const
 	glDisableVertexAttribArray(attr_normals);
 
 #endif
+}
+
+const mrpt::math::TBoundingBox
+	CRenderizableShaderTriangles::trianglesBoundingBox() const
+{
+	mrpt::math::TBoundingBox bb;
+
+	if (m_triangles.empty()) return bb;
+
+	bb.min = mrpt::math::TPoint3D(
+		std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
+		std::numeric_limits<double>::max());
+	bb.max = mrpt::math::TPoint3D(
+		-std::numeric_limits<double>::max(),
+		-std::numeric_limits<double>::max(),
+		-std::numeric_limits<double>::max());
+
+	for (const auto& t : m_triangles)
+	{
+		keep_min(bb.min.x, t.x(0));
+		keep_max(bb.max.x, t.x(0));
+		keep_min(bb.min.y, t.y(0));
+		keep_max(bb.max.y, t.y(0));
+		keep_min(bb.min.z, t.z(0));
+		keep_max(bb.max.z, t.z(0));
+
+		keep_min(bb.min.x, t.x(1));
+		keep_max(bb.max.x, t.x(1));
+		keep_min(bb.min.y, t.y(1));
+		keep_max(bb.max.y, t.y(1));
+		keep_min(bb.min.z, t.z(1));
+		keep_max(bb.max.z, t.z(1));
+
+		keep_min(bb.min.x, t.x(2));
+		keep_max(bb.max.x, t.x(2));
+		keep_min(bb.min.y, t.y(2));
+		keep_max(bb.max.y, t.y(2));
+		keep_min(bb.min.z, t.z(2));
+		keep_max(bb.max.z, t.z(2));
+	}
+	return bb;
 }

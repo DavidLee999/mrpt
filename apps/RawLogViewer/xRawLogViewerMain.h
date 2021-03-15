@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -27,6 +27,7 @@
 #include <wx/textctrl.h>
 #include <wx/things/toggle.h>
 #include <wx/timer.h>
+
 #include "CRawlogTreeView.h"
 #include "MyGLCanvas.h"
 //*)
@@ -34,9 +35,9 @@
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/combobox.h>
+#include <wx/docview.h>
 #include <wx/image.h>
 
-#include <wx/docview.h>
 #include <map>
 #include <string>
 
@@ -44,9 +45,8 @@
 #include <mrpt/config/CConfigFile.h>
 #include <mrpt/gui/CDisplayWindow3D.h>
 #include <mrpt/gui/CDisplayWindowPlots.h>
-#include <mrpt/serialization/CSerializable.h>
-
 #include <mrpt/gui/WxUtils.h>
+#include <mrpt/serialization/CSerializable.h>
 
 // JLBC: Unix X headers have these funny things...
 #ifdef Button1
@@ -121,7 +121,7 @@ class MyArtProvider : public wxArtProvider
 struct TAlogRecord
 {
 	std::string label;
-	char type;  // 0: odo, 1: 2d laser, 2:3d laser, 3: image
+	int8_t type;  // 0: odo, 1: 2d laser, 2:3d laser, 3: image
 	std::vector<float> data;
 	std::string imgFile;
 	double startElev, endElev;
@@ -610,4 +610,4 @@ extern std::unique_ptr<mrpt::config::CConfigFile> iniFile;
 extern std::string loadedFileName;
 extern mrpt::obs::CRawlog rawlog;
 
-#endif  // XRAWLOGVIEWERMAIN_H
+#endif	// XRAWLOGVIEWERMAIN_H

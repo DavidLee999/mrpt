@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -33,6 +33,7 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #include <wx/progdlg.h>
+
 #include "xRawLogViewerMain.h"
 
 using namespace mrpt;
@@ -705,7 +706,7 @@ void CScanMatching::OnbtnICPClick(wxCommandEvent&)
 				txtStep->SetLabel(
 					(format("Step: %u / %u", curStep, maxSteps).c_str()));
 				pbSteps->SetValue(curStep);
-				wxTheApp->Yield();  // Let the app. process messages
+				wxTheApp->Yield();	// Let the app. process messages
 			}
 
 			icp.options.maxIterations = curStep;
@@ -774,7 +775,7 @@ void CScanMatching::OnbtnICPClick(wxCommandEvent&)
 
 			if (isAnimation)
 			{
-				wxTheApp->Yield();  // Let the app. process messages
+				wxTheApp->Yield();	// Let the app. process messages
 				::wxMilliSleep(100);
 			}
 

@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "nav-precomp.h"  // Precomp header
-
+//
 #include <mrpt/math/CVectorDynamic.h>
 #include <mrpt/nav/tpspace/CParameterizedTrajectoryGenerator.h>
 #include <mrpt/opengl/CSetOfLines.h>
@@ -24,7 +24,7 @@ void CPTG_RobotShape_Polygonal::setRobotShape(
 	ASSERT_GE_(robotShape.size(), 3u);
 	m_robotShape = robotShape;
 
-	m_robotMaxRadius = .0;  // Default minimum
+	m_robotMaxRadius = .0;	// Default minimum
 	for (const auto& v : m_robotShape)
 		mrpt::keep_max(m_robotMaxRadius, v.norm());
 
@@ -124,11 +124,8 @@ void CPTG_RobotShape_Polygonal::internal_shape_loadFromStream(
 
 	switch (version)
 	{
-		case 0:
-			in >> m_robotShape;
-			break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		case 0: in >> m_robotShape; break;
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
 

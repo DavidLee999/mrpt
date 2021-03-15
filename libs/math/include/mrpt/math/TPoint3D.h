@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -12,10 +12,14 @@
 #include <mrpt/core/format.h>
 #include <mrpt/math/TPoseOrPoint.h>
 #include <mrpt/math/math_frwds.h>  // CMatrixFixed
+
 #include <cmath>  // sqrt
 
 namespace mrpt::math
 {
+/** \addtogroup  geometry_grp
+ * @{ */
+
 // Ensure 1-byte memory alignment, no additional stride bytes.
 #pragma pack(push, 1)
 
@@ -95,14 +99,10 @@ struct TPoint3D_ : public TPoseOrPoint,
 	{
 		switch (i)
 		{
-			case 0:
-				return TPoint3D_data<T>::x;
-			case 1:
-				return TPoint3D_data<T>::y;
-			case 2:
-				return TPoint3D_data<T>::z;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return TPoint3D_data<T>::x;
+			case 1: return TPoint3D_data<T>::y;
+			case 2: return TPoint3D_data<T>::z;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/** Coordinate access using operator[]. Order: x,y,z */
@@ -110,14 +110,10 @@ struct TPoint3D_ : public TPoseOrPoint,
 	{
 		switch (i)
 		{
-			case 0:
-				return TPoint3D_data<T>::x;
-			case 1:
-				return TPoint3D_data<T>::y;
-			case 2:
-				return TPoint3D_data<T>::z;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return TPoint3D_data<T>::x;
+			case 1: return TPoint3D_data<T>::y;
+			case 2: return TPoint3D_data<T>::z;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/**
@@ -136,14 +132,14 @@ struct TPoint3D_ : public TPoseOrPoint,
 	T sqrDistanceTo(const TPoint3D_<T>& p) const
 	{
 		return square(p.x - TPoint3D_data<T>::x) +
-			   square(p.y - TPoint3D_data<T>::y) +
-			   square(p.z - TPoint3D_data<T>::z);
+			square(p.y - TPoint3D_data<T>::y) +
+			square(p.z - TPoint3D_data<T>::z);
 	}
 	/** Squared norm: |v|^2 = x^2+y^2+z^2 */
 	T sqrNorm() const
 	{
 		return square(TPoint3D_data<T>::x) + square(TPoint3D_data<T>::y) +
-			   square(TPoint3D_data<T>::z);
+			square(TPoint3D_data<T>::z);
 	}
 
 	/** Point norm: |v| = sqrt(x^2+y^2+z^2) */
@@ -155,8 +151,9 @@ struct TPoint3D_ : public TPoseOrPoint,
 		const T n = norm();
 		ASSERT_GT_(n, 0);
 		const T f = 1 / n;
-		return {TPoint3D_data<T>::x * f, TPoint3D_data<T>::y * f,
-				TPoint3D_data<T>::z * f};
+		return {
+			TPoint3D_data<T>::x * f, TPoint3D_data<T>::y * f,
+			TPoint3D_data<T>::z * f};
 	}
 
 	/** Scale point/vector */
@@ -203,28 +200,32 @@ struct TPoint3D_ : public TPoseOrPoint,
 	 */
 	constexpr TPoint3D_<T> operator+(const TPoint3D_<T>& p) const
 	{
-		return {TPoint3D_data<T>::x + p.x, TPoint3D_data<T>::y + p.y,
-				TPoint3D_data<T>::z + p.z};
+		return {
+			TPoint3D_data<T>::x + p.x, TPoint3D_data<T>::y + p.y,
+			TPoint3D_data<T>::z + p.z};
 	}
 	/**
 	 * Points substraction.
 	 */
 	constexpr TPoint3D_<T> operator-(const TPoint3D_<T>& p) const
 	{
-		return {TPoint3D_data<T>::x - p.x, TPoint3D_data<T>::y - p.y,
-				TPoint3D_data<T>::z - p.z};
+		return {
+			TPoint3D_data<T>::x - p.x, TPoint3D_data<T>::y - p.y,
+			TPoint3D_data<T>::z - p.z};
 	}
 
 	constexpr TPoint3D_<T> operator*(T d) const
 	{
-		return {TPoint3D_data<T>::x * d, TPoint3D_data<T>::y * d,
-				TPoint3D_data<T>::z * d};
+		return {
+			TPoint3D_data<T>::x * d, TPoint3D_data<T>::y * d,
+			TPoint3D_data<T>::z * d};
 	}
 
 	constexpr TPoint3D_<T> operator/(T d) const
 	{
-		return {TPoint3D_data<T>::x / d, TPoint3D_data<T>::y / d,
-				TPoint3D_data<T>::z / d};
+		return {
+			TPoint3D_data<T>::x / d, TPoint3D_data<T>::y / d,
+			TPoint3D_data<T>::z / d};
 	}
 
 	bool operator<(const TPoint3D_<T>& p) const;
@@ -373,14 +374,16 @@ constexpr TPoint3D_<T> operator-(const TPoint3D_<T>& p1)
 template <typename T>
 constexpr bool operator==(const TPoint3D_<T>& p1, const TPoint3D_<T>& p2)
 {
-	return (p1.x == p2.x) && (p1.y == p2.y) && (p1.z == p2.z);  //-V550
+	return (p1.x == p2.x) && (p1.y == p2.y) && (p1.z == p2.z);	//-V550
 }
 /** Exact comparison between 3D points */
 template <typename T>
 constexpr bool operator!=(const TPoint3D_<T>& p1, const TPoint3D_<T>& p2)
 {
-	return (p1.x != p2.x) || (p1.y != p2.y) || (p1.z != p2.z);  //-V550
+	return (p1.x != p2.x) || (p1.y != p2.y) || (p1.z != p2.z);	//-V550
 }
+
+/** @} */
 
 }  // namespace mrpt::math
 

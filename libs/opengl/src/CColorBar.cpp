@@ -2,15 +2,16 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
-#include "opengl-precomp.h"  // Precompiled header
-
+#include "opengl-precomp.h"	 // Precompiled header
+//
 #include <mrpt/opengl/CColorBar.h>
 #include <mrpt/serialization/CArchive.h>
+
 #include "gltext.h"
 
 using namespace mrpt;
@@ -214,24 +215,13 @@ void CColorBar::serializeFrom(
 				in >> old_disable_depth_test;
 			}
 			break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 	CRenderizable::notifyChange();
 }
 
-void CColorBar::getBoundingBox(
-	mrpt::math::TPoint3D& bb_min, mrpt::math::TPoint3D& bb_max) const
+auto CColorBar::getBoundingBox() const -> mrpt::math::TBoundingBox
 {
-	bb_min.x = 0;
-	bb_min.y = 0;
-	bb_min.z = 0;
-
-	bb_max.x = m_width;
-	bb_max.y = m_height;
-	bb_max.z = 0;
-
-	// Convert to coordinates of my parent:
-	m_pose.composePoint(bb_min, bb_min);
-	m_pose.composePoint(bb_max, bb_max);
+	return mrpt::math::TBoundingBox({0, 0, 0}, {m_width, m_height, .0})
+		.compose(m_pose);
 }

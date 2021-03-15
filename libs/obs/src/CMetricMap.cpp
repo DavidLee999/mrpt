@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "obs-precomp.h"  // Precompiled headers
-
+//
 #include <mrpt/maps/CMetricMap.h>
 #include <mrpt/maps/CSimpleMap.h>
 #include <mrpt/obs/CSensoryFrame.h>
@@ -55,16 +55,13 @@ void CMetricMap::loadFromProbabilisticPosesAndObservations(
 
 		sf->insertObservationsInto(
 			this,  // Insert into THIS map.
-			&robotPose  // At this pose.
+			&robotPose	// At this pose.
 		);
 	}
 }
 
-/*---------------------------------------------------------------
-						computeObservationsLikelihood
-  ---------------------------------------------------------------*/
 double CMetricMap::computeObservationsLikelihood(
-	const CSensoryFrame& sf, const CPose2D& takenFrom)
+	const CSensoryFrame& sf, const CPose3D& takenFrom)
 {
 	double lik = 0;
 	for (const auto& it : sf)
@@ -73,15 +70,6 @@ double CMetricMap::computeObservationsLikelihood(
 	return lik;
 }
 
-double CMetricMap::computeObservationLikelihood(
-	const CObservation& obs, const CPose2D& takenFrom)
-{
-	return computeObservationLikelihood(obs, CPose3D(takenFrom));
-}
-
-/*---------------------------------------------------------------
-				canComputeObservationLikelihood
-  ---------------------------------------------------------------*/
 bool CMetricMap::canComputeObservationsLikelihood(const CSensoryFrame& sf) const
 {
 	bool can = false;
@@ -108,10 +96,7 @@ bool CMetricMap::insertObservationPtr(
 	const CObservation::Ptr& obs, const CPose3D* robotPose)
 {
 	MRPT_START
-	if (!obs)
-	{
-		THROW_EXCEPTION("Trying to pass a null pointer.");
-	}
+	if (!obs) { THROW_EXCEPTION("Trying to pass a null pointer."); }
 	return insertObservation(*obs, robotPose);
 	MRPT_END
 }
@@ -168,7 +153,8 @@ bool CMetricMap::canComputeObservationLikelihood(
 }
 
 double CMetricMap::computeObservationLikelihood(
-	const mrpt::obs::CObservation& obs, const mrpt::poses::CPose3D& takenFrom)
+	const mrpt::obs::CObservation& obs,
+	const mrpt::poses::CPose3D& takenFrom) const
 {
 	if (genericMapParams.enableObservationLikelihood)
 		return internal_computeObservationLikelihood(obs, takenFrom);

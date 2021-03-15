@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -16,6 +16,7 @@ namespace mrpt::math
 {
 /** 3D segment, consisting of two points.
  * \sa TSegment2D,TLine3D,TPlane,TPolygon3D,TPoint3D
+ * \ingroup geometry_grp
  */
 struct TSegment3D
 {
@@ -40,12 +41,9 @@ struct TSegment3D
 	{
 		switch (i)
 		{
-			case 0:
-				return point1;
-			case 1:
-				return point2;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return point1;
+			case 1: return point2;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/** Access to points using operator[0-1] */
@@ -53,12 +51,9 @@ struct TSegment3D
 	{
 		switch (i)
 		{
-			case 0:
-				return point1;
-			case 1:
-				return point2;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return point1;
+			case 1: return point2;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/**

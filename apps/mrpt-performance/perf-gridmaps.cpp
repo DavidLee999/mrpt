@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -155,10 +155,10 @@ double grid_test_8(int a1, int a2)
 	CTicTac tictac;
 	for (long i = 0; i < N; i++)
 	{
-		CPose2D pose(
+		CPose3D pose(
 			getRandomGenerator().drawUniform(-1.0, 1.0),
-			getRandomGenerator().drawUniform(-1.0, 1.0),
-			getRandomGenerator().drawUniform(-M_PI, M_PI));
+			getRandomGenerator().drawUniform(-1.0, 1.0), .0,
+			getRandomGenerator().drawUniform(-M_PI, M_PI), .0, .0);
 		R += gridmap.computeObservationLikelihood(scan1, pose);
 	}
 	return tictac.Tac() / N;

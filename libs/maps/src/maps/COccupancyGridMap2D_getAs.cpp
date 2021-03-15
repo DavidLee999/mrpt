@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/core/round.h>
 #include <mrpt/maps/COccupancyGridMap2D.h>
 #include <mrpt/maps/CSimplePointsMap.h>
@@ -38,8 +38,7 @@ void COccupancyGridMap2D::getAsImage(
 			unsigned char* destPtr;
 			for (unsigned int y = 0; y < size_y; y++)
 			{
-				if (!verticalFlip)
-					destPtr = img(0, size_y - 1 - y);
+				if (!verticalFlip) destPtr = img(0, size_y - 1 - y);
 				else
 					destPtr = img(0, y);
 				for (unsigned int x = 0; x < size_x; x++)
@@ -55,8 +54,7 @@ void COccupancyGridMap2D::getAsImage(
 			unsigned char* destPtr;
 			for (unsigned int y = 0; y < size_y; y++)
 			{
-				if (!verticalFlip)
-					destPtr = img(0, size_y - 1 - y);
+				if (!verticalFlip) destPtr = img(0, size_y - 1 - y);
 				else
 					destPtr = img(0, y);
 				for (unsigned int x = 0; x < size_x; x++)
@@ -79,15 +77,13 @@ void COccupancyGridMap2D::getAsImage(
 			unsigned char* destPtr;
 			for (unsigned int y = 0; y < size_y; y++)
 			{
-				if (!verticalFlip)
-					destPtr = img(0, size_y - 1 - y);
+				if (!verticalFlip) destPtr = img(0, size_y - 1 - y);
 				else
 					destPtr = img(0, y);
 				for (unsigned int x = 0; x < size_x; x++)
 				{
 					uint8_t c = l2p_255(*srcPtr++);
-					if (c < 120)
-						c = 0;
+					if (c < 120) c = 0;
 					else if (c > 136)
 						c = 255;
 					else
@@ -103,15 +99,13 @@ void COccupancyGridMap2D::getAsImage(
 			unsigned char* destPtr;
 			for (unsigned int y = 0; y < size_y; y++)
 			{
-				if (!verticalFlip)
-					destPtr = img(0, size_y - 1 - y);
+				if (!verticalFlip) destPtr = img(0, size_y - 1 - y);
 				else
 					destPtr = img(0, y);
 				for (unsigned int x = 0; x < size_x; x++)
 				{
 					uint8_t c = l2p_255(*srcPtr++);
-					if (c < 120)
-						c = 0;
+					if (c < 120) c = 0;
 					else if (c > 136)
 						c = 255;
 					else

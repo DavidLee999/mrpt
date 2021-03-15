@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "maps-precomp.h"  // Precomp header
-
+//
 #include <mrpt/maps/COccupancyGridMap3D.h>
 #include <mrpt/maps/CSimplePointsMap.h>
 #include <mrpt/obs/CObservation2DRangeScan.h>
@@ -163,7 +163,7 @@ void COccupancyGridMap3D::insertRay(
 	const int Acz_ = std::abs(Acz);
 
 	const int nStepsRay = mrpt::max3(Acx_, Acy_, Acz_);
-	if (!nStepsRay) return;  // May be...
+	if (!nStepsRay) return;	 // May be...
 
 	const float N_1 = 1.0f / nStepsRay;
 

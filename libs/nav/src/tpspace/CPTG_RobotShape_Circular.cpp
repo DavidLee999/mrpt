@@ -2,13 +2,13 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "nav-precomp.h"  // Precomp header
-
+//
 #include <mrpt/core/round.h>
 #include <mrpt/nav/tpspace/CParameterizedTrajectoryGenerator.h>
 #include <mrpt/opengl/CSetOfLines.h>
@@ -82,11 +82,8 @@ void CPTG_RobotShape_Circular::internal_shape_loadFromStream(
 
 	switch (version)
 	{
-		case 0:
-			in >> m_robotRadius;
-			break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		case 0: in >> m_robotRadius; break;
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
 

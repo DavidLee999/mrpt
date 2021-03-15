@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -16,6 +16,9 @@
 
 namespace mrpt::math
 {
+/** \addtogroup  geometry_grp
+ * @{ */
+
 /**
  * Standard type for storing any lightweight 2D type. Do not inherit from this
  * class.
@@ -166,15 +169,9 @@ struct TObject2D
 		destroy();
 		switch (type = obj.type)
 		{
-			case GEOMETRIC_TYPE_POINT:
-				data.point = obj.data.point;
-				break;
-			case GEOMETRIC_TYPE_SEGMENT:
-				data.segment = obj.data.segment;
-				break;
-			case GEOMETRIC_TYPE_LINE:
-				data.line = obj.data.line;
-				break;
+			case GEOMETRIC_TYPE_POINT: data.point = obj.data.point; break;
+			case GEOMETRIC_TYPE_SEGMENT: data.segment = obj.data.segment; break;
+			case GEOMETRIC_TYPE_LINE: data.line = obj.data.line; break;
 			case GEOMETRIC_TYPE_POLYGON:
 				data.polygon = new TPolygon2D(*(obj.data.polygon));
 				break;
@@ -282,6 +279,8 @@ mrpt::serialization::CArchive& operator>>(
 	mrpt::serialization::CArchive& in, mrpt::math::TObject2D& o);
 mrpt::serialization::CArchive& operator<<(
 	mrpt::serialization::CArchive& out, const mrpt::math::TObject2D& o);
+
+/** @} */
 
 }  // namespace mrpt::math
 

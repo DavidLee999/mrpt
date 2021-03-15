@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -44,7 +44,7 @@ bool COctoMapBase<OCTREE, OCTREE_NODE>::
 	scan.clear();
 
 	CPose3D robotPose3D;
-	if (robotPose)  // Default values are (0,0,0)
+	if (robotPose)	// Default values are (0,0,0)
 		robotPose3D = (*robotPose);
 
 	if (IS_CLASS(obs, CObservation2DRangeScan))
@@ -112,7 +112,7 @@ bool COctoMapBase<OCTREE, OCTREE_NODE>::
 		sensorPt =
 			octomap::point3d(sensorPose.x(), sensorPose.y(), sensorPose.z());
 
-		obs.load();  // ensure points are loaded from an external source
+		obs.load();	 // ensure points are loaded from an external source
 
 		// size:
 		std::size_t sizeRangeScan = 0;
@@ -213,7 +213,8 @@ void COctoMapBase<OCTREE, OCTREE_NODE>::saveMetricMapRepresentationToFile(
 
 template <class OCTREE, class OCTREE_NODE>
 double COctoMapBase<OCTREE, OCTREE_NODE>::internal_computeObservationLikelihood(
-	const mrpt::obs::CObservation& obs, const mrpt::poses::CPose3D& takenFrom)
+	const mrpt::obs::CObservation& obs,
+	const mrpt::poses::CPose3D& takenFrom) const
 {
 	octomap::point3d sensorPt;
 	octomap::Pointcloud scan;
@@ -342,8 +343,7 @@ void COctoMapBase<OCTREE, OCTREE_NODE>::TLikelihoodOptions::readFromStream(
 			in >> decimation;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
 
@@ -433,8 +433,7 @@ void COctoMapBase<OCTREE, OCTREE_NODE>::TRenderingOptions::readFromStream(
 				visibleFreeVoxels;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	}
 }
 

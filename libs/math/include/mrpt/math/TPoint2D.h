@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -12,12 +12,15 @@
 #include <mrpt/core/format.h>
 #include <mrpt/math/TPoseOrPoint.h>
 #include <mrpt/math/math_frwds.h>  // CMatrixFixed
+
 #include <cmath>
 #include <vector>
 
 namespace mrpt::math
 {
-/** \ingroup geometry_grp */
+/** \addtogroup  geometry_grp
+ * @{ */
+
 template <typename T>
 struct TPoint2D_data
 {
@@ -26,7 +29,6 @@ struct TPoint2D_data
 };
 
 /** Base template for TPoint2D and TPoint2Df
- * \ingroup geometry_grp
  */
 template <typename T>
 struct TPoint2D_ : public TPoseOrPoint,
@@ -85,12 +87,9 @@ struct TPoint2D_ : public TPoseOrPoint,
 	{
 		switch (i)
 		{
-			case 0:
-				return this->x;
-			case 1:
-				return this->y;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return this->x;
+			case 1: return this->y;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 	/** Coordinate access using operator[]. Order: x,y */
@@ -98,12 +97,9 @@ struct TPoint2D_ : public TPoseOrPoint,
 	{
 		switch (i)
 		{
-			case 0:
-				return this->x;
-			case 1:
-				return this->y;
-			default:
-				throw std::out_of_range("index out of range");
+			case 0: return this->x;
+			case 1: return this->y;
+			default: throw std::out_of_range("index out of range");
 		}
 	}
 
@@ -231,6 +227,8 @@ constexpr bool operator!=(const TPoint2D_<T>& p1, const TPoint2D_<T>& p2)
 {
 	return (p1.x != p2.x) || (p1.y != p2.y);  //-V550
 }
+
+/** @} */
 
 }  // namespace mrpt::math
 

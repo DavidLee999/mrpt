@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
-
 project(pymrpt)
 
 find_package(PythonInterp)
@@ -60,7 +58,7 @@ add_definitions(-DROS_EXTENSIONS)
 
 target_link_libraries(pymrpt
   ${Boost_LIBRARIES}
-  ${Opencv_LIBRARIES}
+  imp_opencv
   Python3::Python
 )
 

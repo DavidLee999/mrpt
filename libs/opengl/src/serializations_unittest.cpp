@@ -2,18 +2,16 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #define MRPT_NO_WARN_BIG_HDR
-#include <mrpt/opengl.h>
-
-#include <mrpt/io/CMemoryStream.h>
-#include <mrpt/serialization/CArchive.h>
-
 #include <gtest/gtest.h>
+#include <mrpt/io/CMemoryStream.h>
+#include <mrpt/opengl.h>
+#include <mrpt/serialization/CArchive.h>
 
 using namespace mrpt;
 using namespace mrpt::opengl;
@@ -30,7 +28,7 @@ TEST(SerializeTestOpenGL, WriteReadToMem)
 		CLASS_ID(CFrustum),
 		CLASS_ID(CDisk),
 		CLASS_ID(CGridPlaneXY),
-#if MRPT_HAS_OPENCV  // These classes need CImage serialization
+#if MRPT_HAS_OPENCV	 // These classes need CImage serialization
 		CLASS_ID(CMesh),
 		CLASS_ID(CTexturedPlane),
 #endif

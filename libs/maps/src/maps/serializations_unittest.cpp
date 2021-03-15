@@ -2,19 +2,18 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #define MRPT_NO_WARN_BIG_HDR  // Yes, we really want to include all classes.
-#include <mrpt/maps.h>
-#include <mrpt/obs/CObservationPointCloud.h>
-#include <mrpt/obs/CObservationRotatingScan.h>
-
 #include <CTraitsTest.h>
 #include <gtest/gtest.h>
 #include <mrpt/io/CMemoryStream.h>
+#include <mrpt/maps.h>
+#include <mrpt/obs/CObservationPointCloud.h>
+#include <mrpt/obs/CObservationRotatingScan.h>
 #include <mrpt/serialization/CArchive.h>
 
 using namespace mrpt;
@@ -24,7 +23,7 @@ using namespace mrpt::io;
 using namespace mrpt::serialization;
 using namespace std;
 
-#define TEST_CLASS_MOVE_COPY_CTORS(_classname) \
+#define TEST_CLASS_MOVE_COPY_CTORS(_classname)                                 \
 	template class mrpt::CTraitsTest<_classname>
 
 TEST_CLASS_MOVE_COPY_CTORS(CBeacon);

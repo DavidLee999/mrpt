@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -26,6 +26,7 @@
 #include <wx/things/toggle.h>
 #include <wx/timer.h>
 #include <wx/toolbar.h>
+
 #include <optional>
 
 class CDlgCamTracking;
@@ -224,4 +225,4 @@ class _DSceneViewerFrame : public wxFrame
 	DECLARE_EVENT_TABLE()
 };
 
-#endif  // _DSCENEVIEWERMAIN_H
+#endif	// _DSCENEVIEWERMAIN_H

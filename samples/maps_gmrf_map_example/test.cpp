@@ -2,7 +2,7 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
@@ -12,6 +12,7 @@
 #include <mrpt/opengl/CPointCloud.h>
 #include <mrpt/opengl/stock_objects.h>
 #include <mrpt/random.h>
+
 #include <iostream>
 
 using namespace mrpt;
@@ -62,7 +63,7 @@ void Example_GMRF()
 			new MyConnectivityVisitor);
 	gasmap.setMinLoggingLevel(mrpt::system::LVL_DEBUG);
 	gasmap.setCellsConnectivity(conn);
-	gasmap.clear();  // for the connectivity to be taken into account.
+	gasmap.clear();	 // for the connectivity to be taken into account.
 
 	auto gl_data = mrpt::opengl::CPointCloud::Create();
 	gl_data->setPointSize(3.0f);

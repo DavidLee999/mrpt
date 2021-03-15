@@ -2,18 +2,19 @@
    |                     Mobile Robot Programming Toolkit (MRPT)            |
    |                          https://www.mrpt.org/                         |
    |                                                                        |
-   | Copyright (c) 2005-2020, Individual contributors, see AUTHORS file     |
+   | Copyright (c) 2005-2021, Individual contributors, see AUTHORS file     |
    | See: https://www.mrpt.org/Authors - All rights reserved.               |
    | Released under BSD License. See: https://www.mrpt.org/License          |
    +------------------------------------------------------------------------+ */
 
 #include "obs-precomp.h"  // Precompiled headers
-
+//
 #include <mrpt/obs/CObservation2DRangeScan.h>
 #include <mrpt/obs/CSensoryFrame.h>
 #include <mrpt/serialization/CArchive.h>
 #include <mrpt/serialization/metaprogramming_serialization.h>
 #include <mrpt/system/os.h>
+
 #include <iterator>
 
 using namespace mrpt::obs;
@@ -90,8 +91,7 @@ void CSensoryFrame::serializeFrom(
 					m_observations[i]->timestamp = tempTimeStamp;
 		}
 		break;
-		default:
-			MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
+		default: MRPT_THROW_UNKNOWN_SERIALIZATION_VERSION(version);
 	};
 
 	m_cachedMap.reset();
@@ -226,9 +226,7 @@ void CSensoryFrame::eraseByLabel(const std::string& label)
 	for (auto it = begin(); it != end();)
 	{
 		if (!os::_strcmpi((*it)->sensorLabel.c_str(), label.c_str()))
-		{
-			it = erase(it);
-		}
+		{ it = erase(it); }
 		else
 			it++;
 	}
@@ -243,7 +241,7 @@ namespace mrpt::obs
 using scan2pts_functor = void (*)(
 	const mrpt::obs::CObservation2DRangeScan& obs,
 	mrpt::maps::CMetricMap::Ptr& out_map, const void* insertOps);
-extern scan2pts_functor ptr_internal_build_points_map_from_scan2D;  // impl in
+extern scan2pts_functor ptr_internal_build_points_map_from_scan2D;	// impl in
 // CObservation2DRangeScan.cpp
 }  // namespace mrpt::obs
 /*---------------------------------------------------------------
